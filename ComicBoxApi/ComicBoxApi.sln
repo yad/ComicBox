@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.6
+VisualStudioVersion = 15.0.26510.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ComicBoxApi", "ComicBoxApi\ComicBoxApi.csproj", "{AD9BF1D6-DE3A-48F0-8D42-FFB62D1B82F4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ComicBoxApi", "ComicBoxApi\ComicBoxApi.csproj", "{8B684709-0BB0-4C28-AC72-8AEB6B396B61}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +11,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{AD9BF1D6-DE3A-48F0-8D42-FFB62D1B82F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AD9BF1D6-DE3A-48F0-8D42-FFB62D1B82F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AD9BF1D6-DE3A-48F0-8D42-FFB62D1B82F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AD9BF1D6-DE3A-48F0-8D42-FFB62D1B82F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B684709-0BB0-4C28-AC72-8AEB6B396B61}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B684709-0BB0-4C28-AC72-8AEB6B396B61}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B684709-0BB0-4C28-AC72-8AEB6B396B61}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B684709-0BB0-4C28-AC72-8AEB6B396B61}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
