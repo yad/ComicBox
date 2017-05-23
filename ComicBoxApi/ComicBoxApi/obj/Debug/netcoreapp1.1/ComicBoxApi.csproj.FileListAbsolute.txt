@@ -1,9 +1,0 @@
-C:\Repositories\ComicBox\ComicBoxApi\ComicBoxApi\bin\Debug\netcoreapp1.1\ComicBoxApi.deps.json
-C:\Repositories\ComicBox\ComicBoxApi\ComicBoxApi\bin\Debug\netcoreapp1.1\ComicBoxApi.runtimeconfig.json
-C:\Repositories\ComicBox\ComicBoxApi\ComicBoxApi\bin\Debug\netcoreapp1.1\ComicBoxApi.runtimeconfig.dev.json
-C:\Repositories\ComicBox\ComicBoxApi\ComicBoxApi\bin\Debug\netcoreapp1.1\ComicBoxApi.dll
-C:\Repositories\ComicBox\ComicBoxApi\ComicBoxApi\bin\Debug\netcoreapp1.1\ComicBoxApi.pdb
-C:\Repositories\ComicBox\ComicBoxApi\ComicBoxApi\obj\Debug\netcoreapp1.1\ComicBoxApi.csprojResolveAssemblyReference.cache
-C:\Repositories\ComicBox\ComicBoxApi\ComicBoxApi\obj\Debug\netcoreapp1.1\ComicBoxApi.AssemblyInfo.cs
-C:\Repositories\ComicBox\ComicBoxApi\ComicBoxApi\obj\Debug\netcoreapp1.1\ComicBoxApi.dll
-C:\Repositories\ComicBox\ComicBoxApi\ComicBoxApi\obj\Debug\netcoreapp1.1\ComicBoxApi.pdb
