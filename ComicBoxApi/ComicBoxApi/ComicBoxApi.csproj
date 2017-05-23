@@ -3,7 +3,7 @@
   <PropertyGroup>
     <AssemblyName>ComicBoxApi</AssemblyName>
     <TargetFramework>netcoreapp2.0</TargetFramework>
-    <PreserveCompilationContext>true</PreserveCompilationContext>
+    <RuntimeIdentifiers>win-arm;linux-arm</RuntimeIdentifiers>
   </PropertyGroup>
 
   <ItemGroup>
