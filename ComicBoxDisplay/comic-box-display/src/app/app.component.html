@@ -1,7 +1,12 @@
-<h1>
-  {{title}}
-</h1>
+<md-sidenav-container>
 
-<div class="app-content">
-  <router-outlet></router-outlet>
-</div>
+  <md-toolbar color="primary">
+    {{title}}
+    <span class="app-toolbar-filler"></span>
+  </md-toolbar>
+
+  <div class="app-content" color="primary">
+    <router-outlet></router-outlet>
+  </div>
+
+</md-sidenav-container>
