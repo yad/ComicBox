@@ -37,23 +37,16 @@ namespace ComicBoxApi.Controllers
         }
 
         [HttpGet("{book}/{chapter}/{page}")]
-        public string Get(string book, string chapter, string page)
+        public string Get(string book, string chapter, int page)
         {
             byte[] bytes = new byte[0];
             var subpath = CombinePath(book, chapter);
             var file = _fileProvider.GetFileInfo(subpath).PhysicalPath;
-            PdfReader pdfReader = new PdfReader(file);
-            var pg = pdfReader.GetPageN(int.Parse(page));
-            PdfObject obj = FindImageInPDFDictionary(pg);
-            if (obj != null)
+            using (PdfReaderService pdfReader = new PdfReaderService(file))
             {
-                int XrefIndex = Convert.ToInt32(((PrIndirectReference)obj).Number.ToString(System.Globalization.CultureInfo.InvariantCulture));
-                PrStream stream = (PrStream)pdfReader.GetPdfObject(XrefIndex);
-                bytes = PdfReader.GetStreamBytesRaw(stream);                
+                var image = pdfReader.ReadImageAtPage(page);
+                return Convert.ToBase64String(image);
             }
-
-            pdfReader.Close();
-            return Convert.ToBase64String(bytes);
         }
 
         private static readonly string basePath = "Ebooks";
@@ -71,41 +64,6 @@ namespace ComicBoxApi.Controllers
             var subpath = CombinePath(subpaths);
 
             return _fileProvider.GetDirectoryContents(subpath).Select(d => d.Name);
-        }
-
-        private PdfObject FindImageInPDFDictionary(PdfDictionary pg)
-        {
-            PdfDictionary res = (PdfDictionary)PdfReader.GetPdfObject(pg.Get(PdfName.Resources));
-            PdfDictionary xobj = (PdfDictionary)PdfReader.GetPdfObject(res.Get(PdfName.Xobject));
-            if (xobj != null)
-            {
-                foreach (PdfName name in xobj.Keys)
-                {
-
-                    PdfObject obj = xobj.Get(name);
-                    if (obj.IsIndirect())
-                    {
-                        PdfDictionary tg = (PdfDictionary)PdfReader.GetPdfObject(obj);
-
-                        PdfName type = (PdfName)PdfReader.GetPdfObject(tg.Get(PdfName.Subtype));
-
-                        //image at the root of the pdf
-                        if (PdfName.Image.Equals(type))
-                        {
-                            return obj;
-                        }// image inside a form
-                        else if (PdfName.Form.Equals(type))
-                        {
-                            return FindImageInPDFDictionary(tg);
-                        } //image inside a group
-                        else if (PdfName.Group.Equals(type))
-                        {
-                            return FindImageInPDFDictionary(tg);
-                        }
-                    }
-                }
-            }
-            return null;
         }
     }
 }
