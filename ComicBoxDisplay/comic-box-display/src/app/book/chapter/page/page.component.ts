@@ -15,8 +15,8 @@ export class PageComponent implements OnInit {
   }
 
   ngOnInit() {
-      this.http.get("/api/book/Ant-Man/007.pdf/001").subscribe(result => {
-          this.image = 'data:image/png;base64,' + result.text();
+      this.http.get("/api/book/comics/Ant-Man/007.pdf/001").subscribe(result => {
+          this.image = 'data:image/png;base64,' + result.json().page;
       });
   }
 

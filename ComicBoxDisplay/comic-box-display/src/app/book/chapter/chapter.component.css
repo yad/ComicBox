@@ -1,0 +1,17 @@
+.mat-card {
+  min-width: 140px;
+  width: 20%;
+  display: inline-block;
+  margin: 1px;
+}
+
+md-card-title {
+  font-size: 18px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mat-raised-button {
+  padding: 5px 5px;
+}

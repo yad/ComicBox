@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { Http, Response } from '@angular/http';
+import { Observable } from 'rxjs/Observable';
 
 @Component({
   selector: 'app-book',
@@ -7,9 +9,18 @@ import { Component, OnInit } from '@angular/core';
 })
 export class BookComponent implements OnInit {
 
-  constructor() { }
+    public comics: any[];
 
-  ngOnInit() {
-  }
+    constructor(public http: Http) {
+    }
+
+    ngOnInit() {
+        this.http.get("/api/book/comics").subscribe(result => {
+            this.comics = result.json().collection.map(comic => ({
+                name: comic.name,
+                thumbnail: 'data:image/png;base64,' + comic.thumbnail
+            }));
+        });
+    }
 
 }

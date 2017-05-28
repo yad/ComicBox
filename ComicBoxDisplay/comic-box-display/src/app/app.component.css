@@ -1,9 +1,10 @@
 md-sidenav-container {
-  background: black;
+  background: black;  
 }
 
 .app-content {
   padding: 20px;
+  text-align: center;
 }
 
 .app-content md-card {

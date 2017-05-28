@@ -1,3 +1,8 @@
-<p>
-  chapter works!
-</p>
+<md-card *ngFor="let chapter of chapters">
+  <md-card-title>{{chapter.name}}</md-card-title>
+  <md-card-actions>
+    <button md-raised-button color="primary" [routerLink]="['/books', chapter.name, 'chapters']">
+      <img alt="" [src]="chapter.thumbnail" />
+    </button>
+  </md-card-actions>
+</md-card>

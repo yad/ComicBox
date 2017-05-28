@@ -1,11 +1,8 @@
-<md-card *ngFor="let key of  [1,2,3,4,5,6,7,8,9]">
-  <md-card-title>Title</md-card-title>
-  <md-card-content>
-    <p>
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-    </p>
-  </md-card-content>
+<md-card *ngFor="let comic of comics">
+  <md-card-title>{{comic.name}}</md-card-title>
   <md-card-actions>
-    <button md-raised-button color="primary">Lire</button>
+    <button md-raised-button color="primary" [routerLink]="['/books', comic.name, 'chapters']">
+    <img alt="" [src]="comic.thumbnail" />
+    </button>
   </md-card-actions>
 </md-card>
