@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.FileProviders;
 using System.Reflection;
+using ComicBoxApi.App;
 
 namespace ComicBoxApi
 {
@@ -31,7 +32,7 @@ namespace ComicBoxApi
         {
             // Add framework services.
             services.AddMvc();
-            var externalFileProvider = new PhysicalFileProvider(@"C:\Repositories\Storage");
+            var externalFileProvider = new PhysicalFileProvider(PathFinder.AbsoluteBasePath);
             var compositeProvider = new CompositeFileProvider(externalFileProvider);
             services.AddSingleton<IFileProvider>(compositeProvider);
         }
@@ -39,8 +40,8 @@ namespace ComicBoxApi
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
-            loggerFactory.AddDebug();
+            //loggerFactory.AddConsole(Configuration.GetSection("Logging"));
+            //loggerFactory.AddDebug();
 
             app.UseMvc();
             app.UseDeveloperExceptionPage();

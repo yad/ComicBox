@@ -2,9 +2,16 @@
 using System;
 using System.Linq;
 
-namespace ComicBoxApi.Controllers
+namespace ComicBoxApi.App
 {
-    public class PdfReaderService : IDisposable
+    public interface IPdfReaderService : IDisposable
+    {
+        byte[] ReadImageFirstPage();
+
+        byte[] ReadImageAtPage(int page);
+    }
+
+    public class PdfReaderService : IPdfReaderService
     {
         private readonly PdfReader _pdfReader;
 
@@ -12,7 +19,12 @@ namespace ComicBoxApi.Controllers
         {
             _pdfReader = new PdfReader(filename);
         }
-                
+
+        public byte[] ReadImageFirstPage()
+        {
+            return ReadImageAtPage(1);
+        }
+
         public byte[] ReadImageAtPage(int page)
         {
             var currentPage = _pdfReader.GetPageN(page);
