@@ -1,0 +1,12 @@
+<md-sidenav-container>
+
+  <md-toolbar color="primary" [routerLink]="['/books']">
+    {{title}}
+    <span class="app-toolbar-filler"></span>
+  </md-toolbar>
+
+  <div class="app-content" color="primary">
+    <router-outlet></router-outlet>
+  </div>
+
+</md-sidenav-container>
