@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.FileProviders;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.FileProviders;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -18,7 +19,7 @@ namespace ComicBoxApi.App
 
         private readonly IFileProvider _fileProvider;
 
-        public static readonly string AbsoluteBasePath = @"C:\Repositories\Storage";
+        public static string AbsoluteBasePath { get; set; }
 
         public PathFinder(IFileProvider fileProvider)
         {

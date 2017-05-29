@@ -6,7 +6,7 @@ import { ChapterComponent } from './book/chapter/chapter.component';
 import { PageComponent } from './book/chapter/page/page.component';
 
 const routes: Routes = [
-    { path: '', component: BookComponent },
+    { path: 'books', component: BookComponent },
     { path: 'books/:book/chapters', component: ChapterComponent },
     { path: 'books/:book/chapters/:chapter', component: PageComponent },
     { path: '', pathMatch: 'full', redirectTo: 'books', },

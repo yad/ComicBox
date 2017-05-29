@@ -18,6 +18,8 @@ namespace ComicBoxApi
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
             Configuration = builder.Build();
+
+            PathFinder.AbsoluteBasePath = Configuration["Settings:AbsoluteBasePath"];
         }
 
         public IConfigurationRoot Configuration { get; }
