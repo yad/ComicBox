@@ -5,6 +5,13 @@ using System.Linq;
 
 namespace ComicBoxApi.App
 {
+    public enum ListMode
+    {
+        All,
+        OnlyDirectories,
+        OnlyFiles
+    }
+
     public class PathFinder
     {
         private readonly List<string> _subpaths;
@@ -40,9 +47,23 @@ namespace ComicBoxApi.App
             return Path.Combine(GetRelativePath(), file);
         }
 
-        public IReadOnlyCollection<IFileInfo> GetDirectoryContents()
+        public IReadOnlyCollection<IFileInfo> GetDirectoryContents(ListMode listMode)
         {
-            return _fileProvider.GetDirectoryContents(GetRelativePath()).OrderBy(d => d.Name).ToArray();
+            IEnumerable<IFileInfo> directoryContents = _fileProvider.GetDirectoryContents(GetRelativePath());
+
+            switch(listMode)
+            {
+                case ListMode.OnlyDirectories:
+                    directoryContents = directoryContents.Where(f => f.IsDirectory);
+                    break;
+                case ListMode.OnlyFiles:
+                    directoryContents = directoryContents.Where(f => !f.IsDirectory);
+                    break;
+                default:
+                    break;
+            }
+
+            return directoryContents.ToArray();
         }
 
         public IFileInfo GetThumbnailFileInfoForFile(string file)
@@ -66,7 +87,7 @@ namespace ComicBoxApi.App
         private static string LocateFirstFile(PathFinder pathFinder, string appendPath, string matchExtension)
         {
             pathFinder.AppendPathContext(appendPath);
-            var currentDir = pathFinder.GetDirectoryContents();
+            var currentDir = pathFinder.GetDirectoryContents(ListMode.All);
             var firstPdf = currentDir.FirstOrDefault(f => matchExtension.Equals(Path.GetExtension(f.Name)));
             if (firstPdf != null)
             {

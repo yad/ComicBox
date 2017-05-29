@@ -14,21 +14,21 @@ import { ChapterComponent } from './book/chapter/chapter.component';
 import { PageComponent } from './book/chapter/page/page.component';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    BookComponent,
-    ChapterComponent,
-    PageComponent,
-  ],
-  imports: [
-    BrowserModule,
-    FormsModule,
-    HttpModule,
-    AppRoutingModule,
-    MaterialModule,
-    BrowserAnimationsModule,
-  ],
-  providers: [],
-  bootstrap: [AppComponent]
+    declarations: [
+        AppComponent,
+        BookComponent,
+        ChapterComponent,
+        PageComponent,
+    ],
+    imports: [
+        BrowserModule,
+        FormsModule,
+        HttpModule,
+        AppRoutingModule,
+        MaterialModule,
+        BrowserAnimationsModule,
+    ],
+    providers: [],
+    bootstrap: [AppComponent]
 })
 export class AppModule { }
