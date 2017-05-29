@@ -5,29 +5,17 @@
     "iis": {
       "applicationUrl": "http://localhost/ComicBoxApi",
       "sslPort": 0
-    },
-    "iisExpress": {
-      "applicationUrl": "http://localhost:57793/",
-      "sslPort": 0
     }
   },
   "profiles": {
-    "IIS Express": {
+    "ComicBoxApi": {
       "commandName": "IIS",
       "launchBrowser": true,
-      "launchUrl": "api/book",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      }
-    },
-    "ComicBoxApi": {
-      "commandName": "Executable",
-      "launchBrowser": true,
-      "launchUrl": "api/values",
+      "launchUrl": "api/exception",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "http://localhost:57794"
+      "applicationUrl": "http://localhost/ComicBoxApi"
     }
   }
 }
