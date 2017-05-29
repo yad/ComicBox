@@ -42,7 +42,8 @@ namespace ComicBoxApi
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
-            
+
+            // UseDeveloperExceptionPage before UseMvc
             app.UseDeveloperExceptionPage();
 
             app.UseMvc();
