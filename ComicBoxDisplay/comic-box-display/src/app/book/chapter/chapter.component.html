@@ -1,8 +1,11 @@
 <md-card *ngFor="let chapter of chapters">
-  <md-card-title>{{chapter.name}}</md-card-title>
+  <md-card-title>{{chapter.displayName}}</md-card-title>
   <md-card-actions>
-    <button md-raised-button color="primary" [routerLink]="['/books', chapter.name, 'chapters']">
+    <!--<button md-raised-button color="primary" [routerLink]="['/books', book, 'chapters', chapter.name]">
       <img alt="" [src]="chapter.thumbnail" />
-    </button>
+    </button>-->
+    <button md-raised-button color="primary" (click)="openDialog(chapter.name)">
+      <img alt="" [src]="chapter.thumbnail" />
+    </button>    
   </md-card-actions>
 </md-card>

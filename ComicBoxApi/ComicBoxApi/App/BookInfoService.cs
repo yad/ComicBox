@@ -20,7 +20,7 @@ namespace ComicBoxApi.App
         {
             _pathFinder.SetPathContext(subpaths);
 
-            var dirInfo = _pathFinder.GetDirectoryContents();
+            var dirInfo = _pathFinder.GetDirectoryContents(ListMode.OnlyDirectories);
             var thumbnail = new ThumbnailProvider(_pathFinder).GetThumbnail("thumbnail");
             return new BookContainer<string>(Convert.ToBase64String(thumbnail), dirInfo.Select(d => d.Name));
         }
@@ -30,7 +30,7 @@ namespace ComicBoxApi.App
             _pathFinder.SetPathContext(subpaths);
 
             List<Book> books = new List<Book>();
-            var dirInfo = _pathFinder.GetDirectoryContents();
+            var dirInfo = _pathFinder.GetDirectoryContents(ListMode.All);
             foreach(var container in dirInfo.Where(f => f.IsDirectory || ".pdf".Equals(Path.GetExtension(f.Name))))
             {
                 _pathFinder.SetPathContext(subpaths);

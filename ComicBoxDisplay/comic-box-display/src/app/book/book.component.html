@@ -1,8 +1,8 @@
-<md-card *ngFor="let comic of comics">
-  <md-card-title>{{comic.name}}</md-card-title>
+<md-card *ngFor="let book of books">
+  <md-card-title>{{book.name}}</md-card-title>
   <md-card-actions>
-    <button md-raised-button color="primary" [routerLink]="['/books', comic.name, 'chapters']">
-    <img alt="" [src]="comic.thumbnail" />
+    <button md-raised-button color="primary" [routerLink]="['/books', book.name, 'chapters']">
+    <img alt="" [src]="book.thumbnail" />
     </button>
   </md-card-actions>
 </md-card>
