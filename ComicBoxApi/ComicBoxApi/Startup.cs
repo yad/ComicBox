@@ -5,6 +5,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Caching.Memory;
+using ComicBoxApi.App.Cache;
 
 namespace ComicBoxApi
 {
@@ -27,11 +29,14 @@ namespace ComicBoxApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // Add framework services.
+            // Add framework services.            
             services.AddMvc();
+            services.AddMemoryCache();
+
             var externalFileProvider = new PhysicalFileProvider(PathFinder.AbsoluteBasePath);
             var compositeProvider = new CompositeFileProvider(externalFileProvider);
             services.AddSingleton<IFileProvider>(compositeProvider);
+            services.AddSingleton<ICacheService, CacheService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -41,12 +46,13 @@ namespace ComicBoxApi
             loggerFactory.AddDebug();
 
             // UseDeveloperExceptionPage before UseMvc
-            app.UseDeveloperExceptionPage();
+            app.UseDeveloperExceptionPage();            
 
             app.UseDefaultFiles();
             app.UseStaticFiles();
 
             app.UseMvc();
+                
         }
     }
 }
