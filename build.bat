@@ -7,8 +7,9 @@ CALL npm install -g @angular/cli
 cd ComicBoxDisplay\comic-box-display
 CALL npm install
 CALL npm run ng build --prod
-move /Y dist\* .\..\..\Build\
+md .\..\..\Build\wwwroot\
+move /Y dist\* .\..\..\Build\wwwroot\
 cd ..\..
 cd Build
-dotnet ComicBoxApi.dll
+dotnet ComicBoxApi.dll --server.urls http://0.0.0.0:80
 pause
