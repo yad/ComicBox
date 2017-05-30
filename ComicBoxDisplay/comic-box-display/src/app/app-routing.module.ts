@@ -6,11 +6,9 @@ import { ChapterComponent } from './book/chapter/chapter.component';
 import { PageComponent } from './book/chapter/page/page.component';
 
 const routes: Routes = [
-    { path: 'books', component: BookComponent },
-    { path: 'books/:book/chapters', component: ChapterComponent },
-    { path: 'books/:book/chapters/:chapter', component: PageComponent },
-    { path: '', pathMatch: 'full', redirectTo: 'books', },
-    { path: '**', pathMatch: 'full', redirectTo: 'books' },
+    { path: '', component: BookComponent },
+    { path: ':book', component: ChapterComponent },
+    { path: ':book/:chapter', component: PageComponent }
 ];
 
 @NgModule({
