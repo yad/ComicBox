@@ -5,9 +5,20 @@
     "iis": {
       "applicationUrl": "http://localhost/ComicBoxApi",
       "sslPort": 0
+    },
+    "iisExpress": {
+      "applicationUrl": "http://localhost:49568/",
+      "sslPort": 0
     }
   },
   "profiles": {
+    "IIS Express": {
+      "commandName": "IIS",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
     "ComicBoxApi": {
       "commandName": "IIS",
       "launchBrowser": true,
