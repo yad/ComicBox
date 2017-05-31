@@ -26,13 +26,17 @@ namespace ComicBoxApi.App
         [HttpGet("{category}/{pagination}")]
         public BookContainer<Book> Get(string category, int pagination)
         {
-            return _cacheService.LoadFromCache(Request.Path, () => new BookInfoService(_fileProvider).GetBookInfo(category)).WithPagination(pagination);
+            string cacheKey = $"allBooksForCategory_{category}";
+            return _cacheService.LoadFromCache(cacheKey, () => new BookInfoService(_fileProvider).GetBookInfo(category))
+                .WithPagination(pagination);
         }
         
         [HttpGet("{category}/{book}/{pagination}")]
         public BookContainer<Book> Get(string category, string book, int pagination)
         {
-            return _cacheService.LoadFromCache(Request.Path, () => new BookInfoService(_fileProvider).GetBookInfo(category, book)).WithPagination(pagination);
+            string cacheKey = $"chaptersForBook_{category}_{book}";
+            return _cacheService.LoadFromCache(cacheKey, () => new BookInfoService(_fileProvider).GetBookInfo(category, book))
+                .WithPagination(pagination);
         }
 
         //[HttpGet("{category}/{book}/{chapter}")]
