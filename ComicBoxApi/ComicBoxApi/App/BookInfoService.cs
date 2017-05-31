@@ -1,4 +1,5 @@
-﻿using ComicBoxApi.App.Thumbnail;
+﻿using ComicBoxApi.App.FileBrowser;
+using ComicBoxApi.App.Thumbnail;
 using Microsoft.Extensions.FileProviders;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,8 @@ namespace ComicBoxApi.App
     public class BookInfoService
     {
         private readonly PathFinder _pathFinder;
+
+        public static readonly string DefaultFileContainerExtension = ".pdf";
 
         public BookInfoService(IFileProvider fileProvider)
         {
@@ -31,7 +34,7 @@ namespace ComicBoxApi.App
 
             List<Book> books = new List<Book>();
             var dirInfo = _pathFinder.GetDirectoryContents(ListMode.All);
-            foreach(var container in dirInfo.Where(f => f.IsDirectory || ".pdf".Equals(Path.GetExtension(f.Name))))
+            foreach(var container in dirInfo.Where(f => f.IsDirectory || DefaultFileContainerExtension.Equals(Path.GetExtension(f.Name))))
             {
                 _pathFinder.SetPathContext(subpaths);
                 if (container.IsDirectory)
@@ -49,14 +52,33 @@ namespace ComicBoxApi.App
         {
             _pathFinder.SetPathContext(category, book, chapter);
 
-            string fileContent = string.Empty;
             using (PdfReaderService pdfReader = new PdfReaderService(Path.Combine(PathFinder.AbsoluteBasePath, _pathFinder.GetRelativePath())))
             {
                 var image = pdfReader.ReadImageAtPage(page);
-                fileContent = Convert.ToBase64String(image);
+                NextPageType nextPageType = GetNextPageType(pdfReader, page + 1, chapter);
+
+                string fileContent = Convert.ToBase64String(image);
+                return new PageDetail(fileContent, nextPageType);
+            }            
+        }
+
+        private NextPageType GetNextPageType(PdfReaderService pdfReader, int nextPage, string chapter)
+        {
+            NextPageType nextPageType;
+            if (pdfReader.IsPageExists(nextPage))
+            {
+                nextPageType = NextPageType.Page;
+            }
+            else if (_pathFinder.IsNextFileExists(chapter, DefaultFileContainerExtension))
+            {
+                nextPageType = NextPageType.Chapter;
+            }
+            else
+            {
+                nextPageType = NextPageType.End;
             }
 
-            return new PageDetail(fileContent);
+            return nextPageType;
         }
     }
 }

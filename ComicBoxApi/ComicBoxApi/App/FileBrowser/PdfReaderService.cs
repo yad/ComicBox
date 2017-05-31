@@ -2,7 +2,7 @@
 using System;
 using System.Linq;
 
-namespace ComicBoxApi.App
+namespace ComicBoxApi.App.FileBrowser
 {
     public interface IPdfReaderService : IDisposable
     {
@@ -34,6 +34,11 @@ namespace ComicBoxApi.App
             var pdfObject = (PrIndirectReference)xobject.Get(pdfName);
             var stream = (PrStream)_pdfReader.GetPdfObject(pdfObject.Number);
             return PdfReader.GetStreamBytesRaw(stream);
+        }
+
+        public bool IsPageExists(int page)
+        {
+            return _pdfReader.GetPageN(page) != null;
         }
 
         public void Dispose()

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.FileProviders;
+﻿using ComicBoxApi.App.FileBrowser;
+using Microsoft.Extensions.FileProviders;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
@@ -27,7 +28,8 @@ namespace ComicBoxApi.App.Thumbnail
             var fileInfo = _pathFinder.GetThumbnailFileInfoForFile(file);
             if (!fileInfo.Exists)
             {
-                var path = name.Contains(".pdf") ? _pathFinder.LocateFile(name) : _pathFinder.LocateFirstFile(".pdf");
+                var defaultFileContainerExtension = BookInfoService.DefaultFileContainerExtension;
+                var path = name.Contains(defaultFileContainerExtension) ? _pathFinder.LocateFile(name) : _pathFinder.LocateFirstFile(defaultFileContainerExtension);
                 using (StreamWriter sw = new StreamWriter(Path.Combine(PathFinder.AbsoluteBasePath, _pathFinder.GetThumbnailPathForFile(file))))
                 {
                     var fileContent = new PdfReaderService(Path.Combine(PathFinder.AbsoluteBasePath, path)).ReadImageFirstPage();

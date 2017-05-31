@@ -1,15 +1,17 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.FileProviders;
+﻿using Microsoft.Extensions.FileProviders;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System;
 
-namespace ComicBoxApi.App
+namespace ComicBoxApi.App.FileBrowser
 {
     public enum ListMode
     {
         All,
+
         OnlyDirectories,
+
         OnlyFiles
     }
 
@@ -85,19 +87,33 @@ namespace ComicBoxApi.App
             return LocateFirstFile(pathFinder, string.Empty, matchExtension);
         }
 
-        private static string LocateFirstFile(PathFinder pathFinder, string appendPath, string matchExtension)
+        private string LocateFirstFile(PathFinder pathFinder, string appendPath, string matchExtension)
         {
             pathFinder.AppendPathContext(appendPath);
             var currentDir = pathFinder.GetDirectoryContents(ListMode.All);
-            var firstPdf = currentDir.FirstOrDefault(f => matchExtension.Equals(Path.GetExtension(f.Name)));
-            if (firstPdf != null)
+            var firstFile = currentDir.FirstOrDefault(f => matchExtension.Equals(Path.GetExtension(f.Name)));
+            if (firstFile != null)
             {
-                return Path.Combine(pathFinder.GetRelativePath(), firstPdf.Name);
+                return Path.Combine(pathFinder.GetRelativePath(), firstFile.Name);
             }
             else
             {
                 return LocateFirstFile(pathFinder, currentDir.First(f => f.IsDirectory).Name, matchExtension);
             }
+        }
+
+        public bool IsNextFileExists(string file, string matchExtension)
+        {
+            return !string.IsNullOrEmpty(LocateNextFile(file, matchExtension));
+        }
+
+        private string LocateNextFile(string file, string matchExtension)
+        {
+            PathFinder pathFinder = new PathFinder(_fileProvider);
+            pathFinder.SetPathContext(_subpaths.TakeWhile(subpath => !subpath.Equals(file)).ToArray());
+            var currentDir = pathFinder.GetDirectoryContents(ListMode.OnlyFiles).Where(f => matchExtension.Equals(Path.GetExtension(f.Name)));
+            var nextFile = currentDir.SkipWhile(f => !f.Name.Equals(file)).Skip(1).FirstOrDefault();
+            return Path.Combine(pathFinder.GetRelativePath(), nextFile.Name);
         }
     }
 }
