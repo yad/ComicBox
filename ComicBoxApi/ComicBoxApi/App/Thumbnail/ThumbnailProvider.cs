@@ -23,7 +23,7 @@ namespace ComicBoxApi.App.Thumbnail
 
         private IFileInfo EnsureThumbnail(string name)
         {
-            string file = string.Format("{0}.png", name);
+            string file = string.Format("{0}.jpg", name);
             var fileInfo = _pathFinder.GetThumbnailFileInfoForFile(file);
             if (!fileInfo.Exists)
             {
@@ -47,10 +47,12 @@ namespace ComicBoxApi.App.Thumbnail
 
         public byte[] ScaleAsThumbnail(Stream image)
         {
-            using (var imgPhoto = Bitmap.FromStream(image))
+            byte[] result;
+
+            using (var fullBitmap = Bitmap.FromStream(image))
             {
-                int sourceWidth = imgPhoto.Width;
-                int sourceHeight = imgPhoto.Height;
+                int sourceWidth = fullBitmap.Width;
+                int sourceHeight = fullBitmap.Height;
                 int sourceX = 0;
                 int sourceY = 0;
 
@@ -66,20 +68,26 @@ namespace ComicBoxApi.App.Thumbnail
                 destHeight = maxside;
                 destWidth = destHeight * sourceWidth / sourceHeight;
 
-                Bitmap bmPhoto = new Bitmap(destWidth, destHeight, PixelFormat.Format16bppRgb565);
-                bmPhoto.SetResolution(dpi, dpi);
-
-                using (var grPhoto = Graphics.FromImage(bmPhoto))
+                using (Bitmap thumbnailBitmap = new Bitmap(destWidth, destHeight, PixelFormat.Format16bppRgb565))
                 {
-                    grPhoto.InterpolationMode = InterpolationMode.Low;
+                    thumbnailBitmap.SetResolution(dpi, dpi);
 
-                    grPhoto.DrawImage(imgPhoto,
-                        new Rectangle(destX, destY, destWidth, destHeight),
-                        new Rectangle(sourceX, sourceY, sourceWidth, sourceHeight),
-                        GraphicsUnit.Pixel);
+                    using (var graphics = Graphics.FromImage(thumbnailBitmap))
+                    {
+                        graphics.SmoothingMode = SmoothingMode.HighQuality;
+                        graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                        graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
 
-                    return bmPhoto.ToByteArray();
+                        graphics.DrawImage(fullBitmap,
+                            new Rectangle(destX, destY, destWidth, destHeight),
+                            new Rectangle(sourceX, sourceY, sourceWidth, sourceHeight),
+                            GraphicsUnit.Pixel);
+
+                        result = thumbnailBitmap.ToByteArray();
+                    }
                 }
+
+                return result;
             }
 
         }

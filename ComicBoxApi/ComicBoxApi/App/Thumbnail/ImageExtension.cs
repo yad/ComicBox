@@ -10,7 +10,7 @@ namespace ComicBoxApi.App.Thumbnail
         {
             using (MemoryStream ms = new MemoryStream())
             {
-                image.Save(ms, ImageFormat.Png);
+                image.Save(ms, ImageFormat.Jpeg);
                 return ms.ToArray();
             }
         }
