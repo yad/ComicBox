@@ -1,28 +1,15 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-
-namespace ComicBoxApi.App
+﻿namespace ComicBoxApi.App
 {
-    public enum NextPageType
-    {
-        Page,
-
-        Chapter,
-
-        End
-    }
-
     public class PageDetail
     {
         public string Content { get; private set; }
 
-        [JsonConverter(typeof(StringEnumConverter))]
-        public NextPageType NextPageType { get; private set; }
+        public string NextPageOrChapter { get; private set; }
 
-        public PageDetail(string page, NextPageType nextPageType)
+        public PageDetail(string page, string nextPageOrChapter)
         {
             Content = page;
-            NextPageType = nextPageType;
+            NextPageOrChapter = nextPageOrChapter;
         }
     }
 }

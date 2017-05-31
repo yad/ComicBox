@@ -55,30 +55,27 @@ namespace ComicBoxApi.App
             using (PdfReaderService pdfReader = new PdfReaderService(Path.Combine(PathFinder.AbsoluteBasePath, _pathFinder.GetRelativePath())))
             {
                 var image = pdfReader.ReadImageAtPage(page);
-                NextPageType nextPageType = GetNextPageType(pdfReader, page + 1, chapter);
+                string nextPageOrChapter = GetNextPageOrChapter(pdfReader, page + 1, chapter);
 
                 string fileContent = Convert.ToBase64String(image);
-                return new PageDetail(fileContent, nextPageType);
+                return new PageDetail(fileContent, nextPageOrChapter);
             }            
         }
 
-        private NextPageType GetNextPageType(PdfReaderService pdfReader, int nextPage, string chapter)
+        private string GetNextPageOrChapter(PdfReaderService pdfReader, int nextPage, string chapter)
         {
-            NextPageType nextPageType;
+            string nextPageOrChapter;
+
             if (pdfReader.IsPageExists(nextPage))
             {
-                nextPageType = NextPageType.Page;
-            }
-            else if (_pathFinder.IsNextFileExists(chapter, DefaultFileContainerExtension))
-            {
-                nextPageType = NextPageType.Chapter;
+                nextPageOrChapter = "#NEXT_PAGE#";
             }
             else
             {
-                nextPageType = NextPageType.End;
+                nextPageOrChapter = _pathFinder.GetNextFileNameOrDefault(chapter, DefaultFileContainerExtension);
             }
 
-            return nextPageType;
+            return nextPageOrChapter;
         }
     }
 }

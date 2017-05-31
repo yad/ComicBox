@@ -102,18 +102,13 @@ namespace ComicBoxApi.App.FileBrowser
             }
         }
 
-        public bool IsNextFileExists(string file, string matchExtension)
-        {
-            return !string.IsNullOrEmpty(LocateNextFile(file, matchExtension));
-        }
-
-        private string LocateNextFile(string file, string matchExtension)
+        public string GetNextFileNameOrDefault(string file, string matchExtension)
         {
             PathFinder pathFinder = new PathFinder(_fileProvider);
             pathFinder.SetPathContext(_subpaths.TakeWhile(subpath => !subpath.Equals(file)).ToArray());
             var currentDir = pathFinder.GetDirectoryContents(ListMode.OnlyFiles).Where(f => matchExtension.Equals(Path.GetExtension(f.Name)));
             var nextFile = currentDir.SkipWhile(f => !f.Name.Equals(file)).Skip(1).FirstOrDefault();
-            return Path.Combine(pathFinder.GetRelativePath(), nextFile.Name);
+            return nextFile != null ? nextFile.Name : null;
         }
     }
 }
