@@ -11,30 +11,49 @@ import { MD_DIALOG_DATA } from '@angular/material';
 })
 export class PageComponent implements OnInit {
 
-    public book: string;
-
-    public chapter: string;
-
-    public page: number;
-
     public image: string;
 
-    constructor( @Inject(MD_DIALOG_DATA) public data: any, private http: Http) {
+    private book: string;
+
+    private chapter: string;
+
+    private page: number;
+
+    private nextPageOrChapter: string;
+
+    constructor(@Inject(MD_DIALOG_DATA) public data: any, private http: Http) {
         this.book = data.book;
         this.chapter = data.chapter;
         this.page = 1;
     }
 
     nextPage() {
-        this.page++;
-        this.http.get("/api/book/comics/" + this.book + "/" + this.chapter + "/" + this.page).subscribe(result => {
-            this.image = 'data:image/png;base64,' + result.json().content;
-        });
+        this.handleNextPageOrChapter();
+        this.callApi();
     }
 
     ngOnInit() {
-        this.http.get("/api/book/comics/" + this.book + "/" + this.chapter + "/" + this.page).subscribe(result => {
-            this.image = 'data:image/png;base64,' + result.json().content;
+        this.callApi();
+    }
+
+    private handleNextPageOrChapter() {
+        if (!this.nextPageOrChapter) {
+            //End
+        }
+        else if (this.nextPageOrChapter === "#NEXT_PAGE#") {
+            this.page++;
+        }
+        else {
+            this.page = 1;
+            this.chapter = this.nextPageOrChapter;
+        }
+    }
+
+    private callApi() {
+        this.http.get("/api/book/comics/" + this.book + "/" + this.chapter + "/" + this.page).subscribe(response => {
+            const result = response.json();
+            this.image = 'data:image/png;base64,' + result.content;
+            this.nextPageOrChapter = result.nextPageOrChapter;
         });
     }
 
