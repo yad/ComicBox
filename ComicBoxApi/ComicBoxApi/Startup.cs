@@ -1,57 +1,102 @@
-﻿using ComicBoxApi.App.Cache;
+﻿using ComicBoxApi.App;
+using ComicBoxApi.App.Cache;
 using ComicBoxApi.App.FileBrowser;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.AspNetCore.Server.Kestrel.Core.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using System;
+using System.IO;
 
 namespace ComicBoxApi
 {
     public class Startup
     {
-        public Startup(IHostingEnvironment env)
+        public Startup(IConfiguration configuration)
         {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
-                .AddEnvironmentVariables();
-            Configuration = builder.Build();
-
-            PathFinder.AbsoluteBasePath = Configuration["Settings:AbsoluteBasePath"];
+            Configuration = configuration;
         }
 
-        public IConfigurationRoot Configuration { get; }
+        public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // Add framework services.            
             services.AddMvc();
+
+            // Add framework services.                
             services.AddMemoryCache();
 
-            var externalFileProvider = new PhysicalFileProvider(PathFinder.AbsoluteBasePath);
+            var externalFileProvider = new PhysicalFileProvider(Configuration["Settings:AbsoluteBasePath"]);
             var compositeProvider = new CompositeFileProvider(externalFileProvider);
             services.AddSingleton<IFileProvider>(compositeProvider);
+
             services.AddSingleton<ICacheService, CacheService>();
+
+            services.AddTransient<IBookInfoService, BookInfoService>();
+            services.AddTransient<IFilePathFinder, FilePathFinder>();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
-            loggerFactory.AddDebug();
-
             // UseDeveloperExceptionPage before UseMvc
-            app.UseDeveloperExceptionPage();            
+            app.UseDeveloperExceptionPage();
 
             app.UseDefaultFiles();
             app.UseStaticFiles();
 
             app.UseMvc();
+        }
+
+        public static IWebHostBuilder CreateDefaultBuilder(string[] args)
+        {
+            var builder = new WebHostBuilder()
+                .UseUrls("http://*:80")
+                .UseKestrel()
+                .UseContentRoot(Directory.GetCurrentDirectory())
+                .ConfigureAppConfiguration(BuildAppConfiguration(args))
+                .ConfigureLogging(BuildLogging())
+                .UseIISIntegration();
                 
+                //.UseDefaultServiceProvider((context, options) => {})
+                //.ConfigureServices(BuildServices());
+
+            return builder;
+        }
+
+        private static Action<WebHostBuilderContext, IConfigurationBuilder> BuildAppConfiguration(string[] args)
+        {
+            return (hostingContext, config) =>
+            {
+                var env = hostingContext.HostingEnvironment;
+                config.SetBasePath(env.ContentRootPath);
+                config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+                config.AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
+                config.AddEnvironmentVariables();
+                config.AddCommandLine(args);
+            };
+        }
+
+        private static Action<WebHostBuilderContext, LoggerFactory> BuildLogging()
+        {
+            return (hostingContext, logging) =>
+            {
+                logging.UseConfiguration(hostingContext.Configuration.GetSection("Logging"));
+                logging.AddConsole();
+                logging.AddDebug();
+            };
+        }
+
+        private static Action<IServiceCollection> BuildServices()
+        {
+            return services =>
+            {
+                //services.AddTransient<IConfigureOptions<KestrelServerOptions>, KestrelServerOptionsSetup>();
+            };
         }
     }
 }
