@@ -1,6 +1,6 @@
 {
   "/api": {
-    "target": "http://localhost/ComicBoxApi",
+    "target": "http://localhost:49568",
     "secure": "false"
   }
 }

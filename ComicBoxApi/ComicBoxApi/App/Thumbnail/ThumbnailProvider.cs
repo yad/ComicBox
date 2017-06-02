@@ -9,9 +9,9 @@ namespace ComicBoxApi.App.Thumbnail
 {
     public class ThumbnailProvider
     {
-        private readonly PathFinder _pathFinder;
+        private readonly IFilePathFinder _pathFinder;
 
-        public ThumbnailProvider(PathFinder pathFinder)
+        public ThumbnailProvider(IFilePathFinder pathFinder)
         {
             _pathFinder = pathFinder;
         }
@@ -30,9 +30,9 @@ namespace ComicBoxApi.App.Thumbnail
             {
                 var defaultFileContainerExtension = BookInfoService.DefaultFileContainerExtension;
                 var path = name.Contains(defaultFileContainerExtension) ? _pathFinder.LocateFile(name) : _pathFinder.LocateFirstFile(defaultFileContainerExtension);
-                using (StreamWriter sw = new StreamWriter(Path.Combine(PathFinder.AbsoluteBasePath, _pathFinder.GetThumbnailPathForFile(file))))
+                using (StreamWriter sw = new StreamWriter(_pathFinder.LocateFile(file).AbsolutePath))
                 {
-                    var fileContent = new PdfReaderService(Path.Combine(PathFinder.AbsoluteBasePath, path)).ReadImageFirstPage();
+                    var fileContent = new PdfReaderService(path.AbsolutePath).ReadImageFirstPage();
                     using (MemoryStream ms = new MemoryStream(fileContent))
                     {
                         ms.Position = 0;

@@ -1,5 +1,6 @@
 ﻿using ComicBoxApi.App.FileBrowser;
 using ComicBoxApi.App.Thumbnail;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
 using System;
 using System.Collections.Generic;
@@ -8,40 +9,47 @@ using System.Linq;
 
 namespace ComicBoxApi.App
 {
-    public class BookInfoService
+    public interface IBookInfoService
     {
-        private readonly PathFinder _pathFinder;
+        BookContainer<Book> GetBookInfo(params string[] subpaths);
+        PageDetail GetDetail(string category, string book, string chapter, int page);
+        BookContainer<string> GetInfo(params string[] subpaths);
+    }
+
+    public class BookInfoService : IBookInfoService
+    {
+        private readonly IFilePathFinder _filePathFinder;
 
         public static readonly string DefaultFileContainerExtension = ".pdf";
 
-        public BookInfoService(IFileProvider fileProvider)
+        public BookInfoService(IFilePathFinder filePathFinder)
         {
-            _pathFinder = new PathFinder(fileProvider);
+            _filePathFinder = filePathFinder;
         }
 
         public BookContainer<string> GetInfo(params string[] subpaths)
         {
-            _pathFinder.SetPathContext(subpaths);
+            _filePathFinder.SetPathContext(subpaths);
 
-            var dirInfo = _pathFinder.GetDirectoryContents(ListMode.OnlyDirectories);
-            var thumbnail = new ThumbnailProvider(_pathFinder).GetThumbnail("thumbnail");
+            var dirInfo = _filePathFinder.GetDirectoryContents(ListMode.OnlyDirectories);
+            var thumbnail = new ThumbnailProvider(_filePathFinder).GetThumbnail("thumbnail");
             return new BookContainer<string>(Convert.ToBase64String(thumbnail), dirInfo.Select(d => d.Name));
         }
 
         public BookContainer<Book> GetBookInfo(params string[] subpaths)
         {
-            _pathFinder.SetPathContext(subpaths);
+            _filePathFinder.SetPathContext(subpaths);
 
             List<Book> books = new List<Book>();
-            var dirInfo = _pathFinder.GetDirectoryContents(ListMode.All);
+            var dirInfo = _filePathFinder.GetDirectoryContents(ListMode.All);
             foreach(var container in dirInfo.Where(f => f.IsDirectory || DefaultFileContainerExtension.Equals(Path.GetExtension(f.Name))))
             {
-                _pathFinder.SetPathContext(subpaths);
+                _filePathFinder.SetPathContext(subpaths);
                 if (container.IsDirectory)
                 {
-                    _pathFinder.AppendPathContext(container.Name);
+                    _filePathFinder.AppendPathContext(container.Name);
                 }
-                var thumbnail = new ThumbnailProvider(_pathFinder).GetThumbnail(container.Name);
+                var thumbnail = new ThumbnailProvider(_filePathFinder).GetThumbnail(container.Name);
                 books.Add(new Book(container.Name, Convert.ToBase64String(thumbnail)));
             }
 
@@ -50,9 +58,9 @@ namespace ComicBoxApi.App
 
         public PageDetail GetDetail(string category, string book, string chapter, int page)
         {
-            _pathFinder.SetPathContext(category, book, chapter);
+            _filePathFinder.SetPathContext(category, book, chapter);
 
-            using (PdfReaderService pdfReader = new PdfReaderService(Path.Combine(PathFinder.AbsoluteBasePath, _pathFinder.GetRelativePath())))
+            using (PdfReaderService pdfReader = new PdfReaderService(_filePathFinder.GetPath().AbsolutePath))
             {
                 var image = pdfReader.ReadImageAtPage(page);
                 string nextPageOrChapter = GetNextPageOrChapter(pdfReader, page + 1, chapter);
@@ -72,7 +80,7 @@ namespace ComicBoxApi.App
             }
             else
             {
-                nextPageOrChapter = _pathFinder.GetNextFileNameOrDefault(chapter, DefaultFileContainerExtension);
+                nextPageOrChapter = _filePathFinder.GetNextFileNameOrDefault(chapter, DefaultFileContainerExtension);
             }
 
             return nextPageOrChapter;
