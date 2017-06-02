@@ -11,6 +11,7 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace ComicBoxApi
@@ -55,12 +56,12 @@ namespace ComicBoxApi
         public static IWebHostBuilder CreateDefaultBuilder(string[] args)
         {
             var builder = new WebHostBuilder()
-                .UseUrls("http://*:80")
-                .UseKestrel()
-                .UseContentRoot(Directory.GetCurrentDirectory())
                 .ConfigureAppConfiguration(BuildAppConfiguration(args))
-                .ConfigureLogging(BuildLogging())
-                .UseIISIntegration();
+                .UseConfiguration(new ConfigurationBuilder().AddCommandLine(args).Build())
+                .UseKestrel()
+                .UseIISIntegration()
+                .UseContentRoot(Directory.GetCurrentDirectory())                
+                .ConfigureLogging(BuildLogging());
                 
                 //.UseDefaultServiceProvider((context, options) => {})
                 //.ConfigureServices(BuildServices());
@@ -72,7 +73,7 @@ namespace ComicBoxApi
         {
             return (hostingContext, config) =>
             {
-                var env = hostingContext.HostingEnvironment;
+                var env = hostingContext.HostingEnvironment;                
                 config.SetBasePath(env.ContentRootPath);
                 config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
                 config.AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);

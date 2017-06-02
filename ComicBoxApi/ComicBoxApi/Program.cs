@@ -12,7 +12,7 @@ namespace ComicBoxApi
         }
 
         public static IWebHost BuildWebHost(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
+            Startup.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
                 .Build();
     }
