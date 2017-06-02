@@ -1,3 +1,9 @@
 .mat-raised-button {
   padding: 5px 5px;
+  display: block;
+  width: 100%;
+}
+
+.mat-raised-button img{
+  min-width: 100%;
 }
