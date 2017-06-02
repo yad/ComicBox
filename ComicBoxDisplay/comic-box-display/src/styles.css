@@ -22,4 +22,8 @@ md-dialog-container.mat-dialog-container {
   .cdk-overlay-container .cdk-overlay-pane .mat-dialog-container{
     padding: 0;
   }
+
+  .mat-raised-button {
+    padding: 0px !important;
+  }
 }
