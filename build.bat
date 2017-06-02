@@ -11,5 +11,5 @@ md .\..\..\Build\wwwroot\
 move /Y dist\* .\..\..\Build\wwwroot\
 cd ..\..
 cd Build
-dotnet ComicBoxApi.dll --server.urls http://0.0.0.0:80
+dotnet ComicBoxApi.dll --urls "http://*:8080"
 pause

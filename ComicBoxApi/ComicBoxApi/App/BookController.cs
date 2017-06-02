@@ -7,27 +7,27 @@ namespace ComicBoxApi.App
     [Route("api/[controller]")]
     public class BookController : Controller
     {
-        private readonly IFileProvider _fileProvider;
+        private readonly IBookInfoService _bookInfoService;
 
         private readonly ICacheService _cacheService;
 
-        public BookController(IFileProvider fileProvider, ICacheService cacheService)
+        public BookController(IBookInfoService bookInfoService, ICacheService cacheService)
         {
-            _fileProvider = fileProvider;
+            _bookInfoService = bookInfoService;
             _cacheService = cacheService;
         }
 
         [HttpGet("")]
         public BookContainer<string> Get()
         {
-            return new BookInfoService(_fileProvider).GetInfo();
+            return _bookInfoService.GetInfo();
         }
 
         [HttpGet("{category}/{pagination}")]
         public BookContainer<Book> Get(string category, int pagination)
         {
             string cacheKey = $"allBooksForCategory_{category}";
-            return _cacheService.LoadFromCache(cacheKey, () => new BookInfoService(_fileProvider).GetBookInfo(category))
+            return _cacheService.LoadFromCache(cacheKey, () => _bookInfoService.GetBookInfo(category))
                 .WithPagination(pagination);
         }
         
@@ -35,7 +35,7 @@ namespace ComicBoxApi.App
         public BookContainer<Book> Get(string category, string book, int pagination)
         {
             string cacheKey = $"chaptersForBook_{category}_{book}";
-            return _cacheService.LoadFromCache(cacheKey, () => new BookInfoService(_fileProvider).GetBookInfo(category, book))
+            return _cacheService.LoadFromCache(cacheKey, () => _bookInfoService.GetBookInfo(category, book))
                 .WithPagination(pagination);
         }
 
@@ -48,7 +48,7 @@ namespace ComicBoxApi.App
         [HttpGet("{category}/{book}/{chapter}/{page}")]
         public PageDetail Get(string category, string book, string chapter, int page)
         {
-            return new BookInfoService(_fileProvider).GetDetail(category, book, chapter, page);
+            return _bookInfoService.GetDetail(category, book, chapter, page);
         }
     }
 }
