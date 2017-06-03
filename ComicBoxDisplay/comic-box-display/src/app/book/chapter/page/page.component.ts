@@ -19,7 +19,7 @@ export class PageComponent implements OnInit {
 
     private chapter: string;
 
-    constructor(@Inject(MD_DIALOG_DATA) public data: any, private http: Http) {
+    constructor( @Inject(MD_DIALOG_DATA) public data: any, private http: Http) {
         this.book = data.book;
         this.chapter = data.chapter;
     }
@@ -31,7 +31,7 @@ export class PageComponent implements OnInit {
         }
         else {
             this.previousPageOrChapter();
-        }
+        }        
     }
 
     ngOnInit() {
@@ -57,7 +57,8 @@ export class PageComponent implements OnInit {
             const result = response.json();
             this.currentPage = result;
             this.image = `data:image/png;base64,${result.content}`;
-            console.log(this.currentPage);
+
+            document.getElementsByTagName('md-dialog-container')[0].scrollTop = 0;
         });
     }
 
