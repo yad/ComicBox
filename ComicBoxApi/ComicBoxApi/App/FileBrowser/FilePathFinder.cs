@@ -10,7 +10,8 @@ namespace ComicBoxApi.App.FileBrowser
     {
         void AppendPathContext(params string[] subpaths);
         IReadOnlyCollection<IFileInfo> GetDirectoryContents(ListMode listMode);
-        string GetNextFileNameOrDefault(string file, string matchExtension);
+        IFileInfo GetPreviousFileNameOrDefault(string file, string matchExtension);
+        IFileInfo GetNextFileNameOrDefault(string file, string matchExtension);
         FilePath GetPath();
         IFileInfo GetThumbnailFileInfoForFile(string file);
         FilePath LocateFile(string file);
@@ -109,13 +110,20 @@ namespace ComicBoxApi.App.FileBrowser
             }
         }
 
-        public string GetNextFileNameOrDefault(string file, string matchExtension)
+        public IFileInfo GetPreviousFileNameOrDefault(string file, string matchExtension)
         {
             FilePathFinder filePathFinder = BuildNewInstance();
             filePathFinder.SetPathContext(_subpaths.TakeWhile(subpath => !subpath.Equals(file)).ToArray());
             var currentDir = filePathFinder.GetDirectoryContents(ListMode.OnlyFiles).Where(f => matchExtension.Equals(Path.GetExtension(f.Name)));
-            var nextFile = currentDir.SkipWhile(f => !f.Name.Equals(file)).Skip(1).FirstOrDefault();
-            return nextFile != null ? nextFile.Name : null;
+            return currentDir.TakeWhile(f => !f.Name.Equals(file)).LastOrDefault();
+        }
+
+        public IFileInfo GetNextFileNameOrDefault(string file, string matchExtension)
+        {
+            FilePathFinder filePathFinder = BuildNewInstance();
+            filePathFinder.SetPathContext(_subpaths.TakeWhile(subpath => !subpath.Equals(file)).ToArray());
+            var currentDir = filePathFinder.GetDirectoryContents(ListMode.OnlyFiles).Where(f => matchExtension.Equals(Path.GetExtension(f.Name)));
+            return currentDir.SkipWhile(f => !f.Name.Equals(file)).Skip(1).FirstOrDefault();
         }
     }
 }

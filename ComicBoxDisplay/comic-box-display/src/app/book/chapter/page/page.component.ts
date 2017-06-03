@@ -11,49 +11,53 @@ import { MD_DIALOG_DATA } from '@angular/material';
 })
 export class PageComponent implements OnInit {
 
+    public currentPage: any;
+
     public image: string;
 
     private book: string;
 
     private chapter: string;
 
-    private page: number;
-
-    private nextPageOrChapter: string;
-
     constructor(@Inject(MD_DIALOG_DATA) public data: any, private http: Http) {
         this.book = data.book;
         this.chapter = data.chapter;
-        this.page = 1;
     }
 
-    nextPage() {
-        this.handleNextPageOrChapter();
-        this.callApi();
+    changePage($event) {
+        const halfScreenPosition = $event.view.innerWidth / 2;
+        if ($event.x > halfScreenPosition) {
+            this.nextPageOrChapter();
+        }
+        else {
+            this.previousPageOrChapter();
+        }
     }
 
     ngOnInit() {
-        this.callApi();
+        this.callApi(this.book, this.chapter, 1);
     }
 
-    private handleNextPageOrChapter() {
-        if (!this.nextPageOrChapter) {
-            //End
-        }
-        else if (this.nextPageOrChapter === "#NEXT_PAGE#") {
-            this.page++;
-        }
-        else {
-            this.page = 1;
-            this.chapter = this.nextPageOrChapter;
+    private nextPageOrChapter() {
+        const next = this.currentPage.next;
+        if (next) {
+            this.callApi(this.book, next.chapterNumber, next.pageNumber);
         }
     }
 
-    private callApi() {
-        this.http.get("/api/book/comics/" + this.book + "/" + this.chapter + "/" + this.page).subscribe(response => {
+    private previousPageOrChapter() {
+        const previous = this.currentPage.previous;
+        if (previous) {
+            this.callApi(this.book, previous.chapterNumber, previous.pageNumber);
+        }
+    }
+
+    private callApi(book: string, chapter: string, page: number) {
+        this.http.get(`/api/book/comics/${book}/${chapter}/${page}`).subscribe(response => {
             const result = response.json();
-            this.image = 'data:image/png;base64,' + result.content;
-            this.nextPageOrChapter = result.nextPageOrChapter;
+            this.currentPage = result;
+            this.image = `data:image/png;base64,${result.content}`;
+            console.log(this.currentPage);
         });
     }
 

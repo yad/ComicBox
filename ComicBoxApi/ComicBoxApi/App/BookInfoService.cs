@@ -42,7 +42,7 @@ namespace ComicBoxApi.App
 
             List<Book> books = new List<Book>();
             var dirInfo = _filePathFinder.GetDirectoryContents(ListMode.All);
-            foreach(var container in dirInfo.Where(f => f.IsDirectory || DefaultFileContainerExtension.Equals(Path.GetExtension(f.Name))))
+            foreach (var container in dirInfo.Where(f => f.IsDirectory || DefaultFileContainerExtension.Equals(Path.GetExtension(f.Name))))
             {
                 _filePathFinder.SetPathContext(subpaths);
                 if (container.IsDirectory)
@@ -63,27 +63,73 @@ namespace ComicBoxApi.App
             using (PdfReaderService pdfReader = new PdfReaderService(_filePathFinder.GetPath().AbsolutePath))
             {
                 var image = pdfReader.ReadImageAtPage(page);
-                string nextPageOrChapter = GetNextPageOrChapter(pdfReader, page + 1, chapter);
 
                 string fileContent = Convert.ToBase64String(image);
-                return new PageDetail(fileContent, nextPageOrChapter);
-            }            
+                return new PageDetail(chapter, page)
+                    .WithContent(fileContent)
+                    .WithPrevious(GetPreviousPageAndChapter(pdfReader, page, chapter))
+                    .WithNext(GetNextPageAndChapter(pdfReader, page, chapter));
+            }
         }
 
-        private string GetNextPageOrChapter(PdfReaderService pdfReader, int nextPage, string chapter)
+        private PageDetail GetPreviousPageAndChapter(PdfReaderService pdfReader, int page, string chapter)
         {
-            string nextPageOrChapter;
+            PageDetail previousPageAndChapter;
+            int previousPage = page - 1;
 
-            if (pdfReader.IsPageExists(nextPage))
+            if (pdfReader.IsPageExists(previousPage))
             {
-                nextPageOrChapter = "#NEXT_PAGE#";
+                previousPageAndChapter = new PageDetail(chapter, previousPage);
             }
             else
             {
-                nextPageOrChapter = _filePathFinder.GetNextFileNameOrDefault(chapter, DefaultFileContainerExtension);
+                var previousChapter = _filePathFinder.GetPreviousFileNameOrDefault(chapter, DefaultFileContainerExtension);
+                if (previousChapter != null)
+                {
+                    int previousChapterLastPage = GetPreviousChapterLastPage(previousChapter.PhysicalPath);
+                    previousPageAndChapter = new PageDetail(previousChapter.Name, previousChapterLastPage);
+                }
+                else
+                {
+                    previousPageAndChapter = PageDetail.NotFound;
+                }
             }
 
-            return nextPageOrChapter;
+            return previousPageAndChapter;
+        }
+
+        private static int GetPreviousChapterLastPage(string previousChapterFullPath)
+        {
+            using (PdfReaderService pdfReaderPreviousFile = new PdfReaderService(previousChapterFullPath))
+            {
+                return pdfReaderPreviousFile.GetLastPageNumber();
+            }
+        }
+
+        private PageDetail GetNextPageAndChapter(PdfReaderService pdfReader, int page, string chapter)
+        {
+            PageDetail nextPageAndChapter;
+            int nextPage = page + 1;
+
+            if (pdfReader.IsPageExists(nextPage))
+            {
+                nextPageAndChapter = new PageDetail(chapter, nextPage);
+            }
+            else
+            {
+                var nextChapter = _filePathFinder.GetNextFileNameOrDefault(chapter, DefaultFileContainerExtension);
+                if (nextChapter != null)
+                {
+                    const int nextChapterFirstPage = 1;
+                    nextPageAndChapter = new PageDetail(nextChapter.Name, nextChapterFirstPage);
+                }
+                else
+                {
+                    nextPageAndChapter = PageDetail.NotFound;
+                }
+            }
+
+            return nextPageAndChapter;
         }
     }
 }
