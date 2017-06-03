@@ -1,7 +1,6 @@
 ﻿using ComicBoxApi.App.FileBrowser;
-using ComicBoxApi.App.Thumbnail;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.FileProviders;
+using ComicBoxApi.App.PdfReader;
+using ComicBoxApi.App.Imaging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -19,12 +18,13 @@ namespace ComicBoxApi.App
     public class BookInfoService : IBookInfoService
     {
         private readonly IFilePathFinder _filePathFinder;
-
+        private readonly IImageService _imageService;
         public static readonly string DefaultFileContainerExtension = ".pdf";
 
-        public BookInfoService(IFilePathFinder filePathFinder)
+        public BookInfoService(IFilePathFinder filePathFinder, IImageService imageService)
         {
             _filePathFinder = filePathFinder;
+            _imageService = imageService;
         }
 
         public BookContainer<string> GetInfo(params string[] subpaths)
@@ -32,7 +32,7 @@ namespace ComicBoxApi.App
             _filePathFinder.SetPathContext(subpaths);
 
             var dirInfo = _filePathFinder.GetDirectoryContents(ListMode.OnlyDirectories);
-            var thumbnail = new ThumbnailProvider(_filePathFinder).GetThumbnail("thumbnail");
+            var thumbnail = new ThumbnailProvider(_filePathFinder, _imageService).GetThumbnail("thumbnail");
             return new BookContainer<string>(Convert.ToBase64String(thumbnail), dirInfo.Select(d => d.Name));
         }
 
@@ -49,7 +49,7 @@ namespace ComicBoxApi.App
                 {
                     _filePathFinder.AppendPathContext(container.Name);
                 }
-                var thumbnail = new ThumbnailProvider(_filePathFinder).GetThumbnail(container.Name);
+                var thumbnail = new ThumbnailProvider(_filePathFinder, _imageService).GetThumbnail(container.Name);
                 books.Add(new Book(container.Name, Convert.ToBase64String(thumbnail)));
             }
 

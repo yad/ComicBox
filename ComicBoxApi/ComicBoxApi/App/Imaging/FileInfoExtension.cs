@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.FileProviders;
 using System.IO;
 
-namespace ComicBoxApi.App.Thumbnail
+namespace ComicBoxApi.App.Imaging
 {
     public static class FileInfoExtension
     {

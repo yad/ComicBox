@@ -1,6 +1,7 @@
 ﻿using ComicBoxApi.App;
 using ComicBoxApi.App.Cache;
 using ComicBoxApi.App.FileBrowser;
+using ComicBoxApi.App.Imaging;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -82,7 +83,8 @@ namespace ComicBoxApi
             var compositeProvider = new CompositeFileProvider(externalFileProvider);
             services.AddSingleton<IFileProvider>(compositeProvider);
 
-            services.AddSingleton<ICacheService, CacheService>();
+            services.AddSingleton<ICacheService, CacheService>();            
+            services.AddSingleton<IImageService, ImageService>();
 
             services.AddTransient<IBookInfoService, BookInfoService>();
             services.AddTransient<IFilePathFinder, FilePathFinder>();
