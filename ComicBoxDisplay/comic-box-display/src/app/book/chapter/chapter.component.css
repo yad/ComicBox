@@ -11,7 +11,3 @@ md-card-title {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
-.mat-raised-button {
-  padding: 5px 5px;
-}
