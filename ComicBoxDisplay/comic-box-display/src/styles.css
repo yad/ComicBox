@@ -21,8 +21,8 @@ md-dialog-container.mat-dialog-container {
   padding: 0px !important;
 }
 
-.mat-card[_ngcontent-c3] {
-  min-width: 125px !important;
+.mat-card {
+  width: 125px;
 }
 
 @media (orientation: portrait) and (min-width: 414px), (orientation: landscape) and (min-width: 736px) {
