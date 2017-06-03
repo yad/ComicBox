@@ -41,6 +41,11 @@ namespace ComicBoxApi.App.FileBrowser
             return _pdfReader.GetPageN(page) != null;
         }
 
+        public int GetLastPageNumber()
+        {
+            return _pdfReader.NumberOfPages;
+        }
+
         public void Dispose()
         {
             _pdfReader.Close();
