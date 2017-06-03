@@ -20,11 +20,11 @@ export class BookComponent implements OnInit {
     }
 
     private callApi(pagination: number) {
-        this.http.get("/api/book/comics/" + pagination).subscribe(response => {
+        this.http.get(`/api/book/comics/${pagination}`).subscribe(response => {
             const result = response.json();
             const collection = result.collection.map(book => ({
                 name: book.name,
-                thumbnail: 'data:image/png;base64,' + book.thumbnail
+                thumbnail: `data:image/png;base64,${book.thumbnail}` 
             }));
 
             this.books.push(...collection);

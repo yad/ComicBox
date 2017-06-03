@@ -36,12 +36,12 @@ export class ChapterComponent implements OnInit {
     private callApi(pagination: number) {
         this.route.params.subscribe(params => {
             this.book = params["book"];
-            this.http.get("/api/book/comics/" + this.book + "/" +  pagination).subscribe(response => {
+            this.http.get(`/api/book/comics/${this.book}/${pagination}`).subscribe(response => {
                 const result = response.json();
                 const collection = result.collection.map(chapter => ({
                     name: chapter.name,
-                    displayName: "Tome #" + parseInt(chapter.name.slice(0, -4)),
-                    thumbnail: 'data:image/png;base64,' + chapter.thumbnail
+                    displayName: `Tome #${parseInt(chapter.name.slice(0, -4))}`,
+                    thumbnail: `data:image/png;base64,${chapter.thumbnail}`
                 }));
 
                 this.chapters.push(...collection);
