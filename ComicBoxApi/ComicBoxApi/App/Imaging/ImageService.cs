@@ -17,31 +17,28 @@ namespace ComicBoxApi.App.Imaging
         public byte[] ScaleAsThumbnail(byte[] bytes)
         {
             using (MemoryStream image = new MemoryStream(bytes))
+            using (var fullBitmap = Bitmap.FromStream(image))
             {
-                image.Position = 0;
-                using (var fullBitmap = Bitmap.FromStream(image))
-                {
-                    int sourceWidth = fullBitmap.Width;
-                    int sourceHeight = fullBitmap.Height;
-                    int sourceX = 0;
-                    int sourceY = 0;
+                int sourceWidth = fullBitmap.Width;
+                int sourceHeight = fullBitmap.Height;
+                int sourceX = 0;
+                int sourceY = 0;
 
-                    int destX = 0;
-                    int destY = 0;
+                int destX = 0;
+                int destY = 0;
 
-                    float dpi = 72.0f;
-                    float ratio = 2.54f / dpi;
-                    int maxside = (int)(5.2f / ratio);
+                float dpi = 72.0f;
+                float ratio = 2.54f / dpi;
+                int maxside = (int)(5.2f / ratio);
 
-                    int destHeight = maxside;
-                    int destWidth = destHeight * sourceWidth / sourceHeight;
+                int destHeight = maxside;
+                int destWidth = destHeight * sourceWidth / sourceHeight;
 
-                    return ApplySizeAndDimenssions(fullBitmap, sourceWidth, sourceHeight, sourceX, sourceY, destWidth, destHeight, destX, destY, dpi);
-                }
+                return Resize(fullBitmap, sourceWidth, sourceHeight, sourceX, sourceY, destWidth, destHeight, destX, destY, dpi);
             }
         }
 
-        private static byte[] ApplySizeAndDimenssions(Image fullBitmap, int sourceWidth, int sourceHeight, int sourceX, int sourceY, int destWidth, int destHeight, int destX, int destY, float dpi)
+        private static byte[] Resize(Image fullBitmap, int sourceWidth, int sourceHeight, int sourceX, int sourceY, int destWidth, int destHeight, int destX, int destY, float dpi)
         {
             byte[] result;
             using (Bitmap thumbnailBitmap = new Bitmap(destWidth, destHeight, PixelFormat.Format16bppRgb565))
@@ -72,24 +69,21 @@ namespace ComicBoxApi.App.Imaging
             {
                 return bytes;
             }
-            
+
             using (MemoryStream image = new MemoryStream(bytes))
+            using (var fullBitmap = Bitmap.FromStream(image))
             {
-                image.Position = 0;
-                using (var fullBitmap = Bitmap.FromStream(image))
-                {
-                    int sourceWidth = fullBitmap.Width / 2;
-                    int sourceHeight = fullBitmap.Height;
-                    int sourceX = imageSide == ImageSide.Left ? 0 : sourceWidth;
-                    int sourceY = 0;
+                int sourceWidth = fullBitmap.Width / 2;
+                int sourceHeight = fullBitmap.Height;
+                int sourceX = imageSide == ImageSide.Left ? 0 : sourceWidth;
+                int sourceY = 0;
 
-                    int destX = 0;
-                    int destY = 0;
-                    int destWidth = sourceWidth;
-                    int destHeight = sourceHeight;
+                int destX = 0;
+                int destY = 0;
+                int destWidth = sourceWidth;
+                int destHeight = sourceHeight;
 
-                    return ApplySizeAndDimenssions(fullBitmap, sourceWidth, sourceHeight, sourceX, sourceY, destWidth, destHeight, destX, destY, fullBitmap.HorizontalResolution);
-                }
+                return Resize(fullBitmap, sourceWidth, sourceHeight, sourceX, sourceY, destWidth, destHeight, destX, destY, fullBitmap.HorizontalResolution);
             }
         }
     }
