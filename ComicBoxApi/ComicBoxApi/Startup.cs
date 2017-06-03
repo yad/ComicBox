@@ -95,9 +95,22 @@ namespace ComicBoxApi
             // UseDeveloperExceptionPage before UseMvc
             app.UseDeveloperExceptionPage();
 
+            app.Use(async (context, next) =>
+            {
+                await next();
+
+                // If there's no available route, rewrite request to use app root
+                if (context.Response.StatusCode == 404)
+                {
+                    context.Request.Path = "/";
+                    context.Response.StatusCode = 200;
+                    await next();
+                }
+            });
+
             app.UseDefaultFiles();
             app.UseStaticFiles();
-
+            
             app.UseMvc();
         }
     }

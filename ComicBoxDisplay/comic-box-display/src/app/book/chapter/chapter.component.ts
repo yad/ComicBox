@@ -30,25 +30,34 @@ export class ChapterComponent implements OnInit {
 
     ngOnInit() {
         this.chapters = [];
-        this.callApi(1);
-    }
 
-    private callApi(pagination: number) {
         this.route.params.subscribe(params => {
             this.book = params["book"];
-            this.http.get(`/api/book/comics/${this.book}/${pagination}`).subscribe(response => {
-                const result = response.json();
-                const collection = result.collection.map(chapter => ({
-                    name: chapter.name,
-                    displayName: `Tome #${parseInt(chapter.name.slice(0, -4))}`,
-                    thumbnail: `data:image/png;base64,${chapter.thumbnail}`
-                }));
-
-                this.chapters.push(...collection);
-                if (result.hasNextPagination) {
-                    this.callApi(pagination + 1);
+            const chapter = params["chapter"];
+            this.callApi(1, () => {
+                if (chapter) {
+                    this.openDialog(chapter);
                 }
             });
+        });
+    }
+
+    private callApi(pagination: number, callback: Function) {
+        return this.http.get(`/api/book/comics/${this.book}/${pagination}`).subscribe(response => {
+            const result = response.json();
+            const collection = result.collection.map(chapter => ({
+                name: chapter.name,
+                displayName: `Tome #${parseInt(chapter.name.slice(0, -4))}`,
+                thumbnail: `data:image/png;base64,${chapter.thumbnail}`
+            }));
+
+            this.chapters.push(...collection);
+            if (result.hasNextPagination) {
+                this.callApi(pagination + 1, callback);
+            }
+            else {
+                callback();
+            }
         });
     }
 }
