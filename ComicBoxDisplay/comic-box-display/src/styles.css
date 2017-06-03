@@ -25,7 +25,7 @@ md-dialog-container.mat-dialog-container {
   min-width: 125px !important;
 }
 
-@media (orientation: portrait) and (max-width: 864px) and (min-width: 414px), (orientation: landscape) and (max-width: 1152px) and (min-width: 736px) {
+@media (orientation: portrait) and (min-width: 414px), (orientation: landscape) and (min-width: 736px) {
   .cdk-overlay-container .cdk-overlay-pane {
     height: 100%;
   }
