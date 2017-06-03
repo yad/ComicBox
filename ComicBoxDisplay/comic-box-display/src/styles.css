@@ -26,4 +26,8 @@ md-dialog-container.mat-dialog-container {
   .mat-raised-button {
     padding: 0px !important;
   }
+
+  .mat-card[_ngcontent-c3] {
+    min-width: 125px!important;
+  }
 }
