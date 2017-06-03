@@ -21,14 +21,23 @@ export class PageComponent implements OnInit {
 
     private nextPageOrChapter: string;
 
+    private previousPageOrChapter: string;
+
     constructor(@Inject(MD_DIALOG_DATA) public data: any, private http: Http) {
         this.book = data.book;
         this.chapter = data.chapter;
         this.page = 1;
     }
 
-    nextPage() {
-        this.handleNextPageOrChapter();
+    changePage($event) {
+        const screenMiddleLimit = $event.view.innerWidth / 2;
+        if ($event.x > screenMiddleLimit) {
+            this.handleNextPageOrChapter();
+        }
+        else {
+            this.handlePreviousPageOrChapter();
+        }
+        
         this.callApi();
     }
 
@@ -49,11 +58,25 @@ export class PageComponent implements OnInit {
         }
     }
 
+    private handlePreviousPageOrChapter() {
+        if (!this.previousPageOrChapter) {
+            //End
+        }
+        else if (this.previousPageOrChapter === "#PREVIOUS_PAGE#") {
+            this.page--;
+        }
+        else {
+            this.page = 1;
+            this.chapter = this.previousPageOrChapter;
+        }
+    }
+
     private callApi() {
         this.http.get("/api/book/comics/" + this.book + "/" + this.chapter + "/" + this.page).subscribe(response => {
             const result = response.json();
             this.image = 'data:image/png;base64,' + result.content;
             this.nextPageOrChapter = result.nextPageOrChapter;
+            this.previousPageOrChapter = result.previousPageOrChapter;
         });
     }
 
