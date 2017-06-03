@@ -30,8 +30,8 @@ export class PageComponent implements OnInit {
     }
 
     changePage($event) {
-        const screenMiddleLimit = $event.view.innerWidth / 2;
-        if ($event.x > screenMiddleLimit) {
+        const halfScreenPosition = $event.view.innerWidth / 2;
+        if ($event.x > halfScreenPosition) {
             this.handleNextPageOrChapter();
         }
         else {
