@@ -5,14 +5,15 @@ import { BookComponent } from './book/book.component';
 import { ChapterComponent } from './book/chapter/chapter.component';
 import { PageComponent } from './book/chapter/page/page.component';
 
-const routes: Routes = [
-    { path: '', component: BookComponent },
+const routes: Routes = [        
+    { path: ':book/:chapter', component: ChapterComponent },
     { path: ':book', component: ChapterComponent },
-    { path: ':book/:chapter', component: PageComponent }
+    { path: '', component: BookComponent }
 ];
 
 @NgModule({
     imports: [RouterModule.forRoot(routes)],
-    exports: [RouterModule]
+    exports: [RouterModule],
+    entryComponents: [PageComponent]
 })
 export class AppRoutingModule { }
