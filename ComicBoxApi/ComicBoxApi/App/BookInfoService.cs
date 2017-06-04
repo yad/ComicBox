@@ -39,7 +39,7 @@ namespace ComicBoxApi.App
                 {
                     _filePathFinder.AppendPathContext(container.Name);
                 }
-                var thumbnail = new ThumbnailProvider(_filePathFinder, _imageService).GetThumbnail(container.Name);
+                var thumbnail = new ThumbnailProvider(_filePathFinder).GetThumbnailContent(container.Name);
                 books.Add(new Book(container.Name, Convert.ToBase64String(thumbnail)));
             }
 

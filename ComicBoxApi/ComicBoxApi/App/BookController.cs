@@ -1,6 +1,5 @@
 ﻿using ComicBoxApi.App.Cache;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.FileProviders;
 
 namespace ComicBoxApi.App
 {

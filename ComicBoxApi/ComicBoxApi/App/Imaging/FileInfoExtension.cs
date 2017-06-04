@@ -7,6 +7,11 @@ namespace ComicBoxApi.App.Imaging
     {
         public static byte[] ToByteArray(this IFileInfo fileInfo)
         {
+            if (!fileInfo.Exists)
+            {
+                return new byte[0];
+            }
+
             using (Stream input = fileInfo.CreateReadStream())
             using (MemoryStream ms = new MemoryStream())
             {
