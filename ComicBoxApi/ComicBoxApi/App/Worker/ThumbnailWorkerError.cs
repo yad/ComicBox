@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ComicBoxApi.App.Imaging
+namespace ComicBoxApi.App.Worker
 {
     public class ThumbnailWorkerError
     {
