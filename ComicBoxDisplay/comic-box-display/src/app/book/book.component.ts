@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { Http, Response } from '@angular/http';
-import { Observable } from 'rxjs/Observable';
 
 @Component({
     selector: 'app-book',
@@ -24,7 +23,7 @@ export class BookComponent implements OnInit {
             const result = response.json();
             const collection = result.collection.map(book => ({
                 name: book.name,
-                thumbnail: `data:image/png;base64,${book.thumbnail}` 
+                thumbnail: `data:image/png;base64,${book.thumbnail}`
             }));
 
             this.books.push(...collection);

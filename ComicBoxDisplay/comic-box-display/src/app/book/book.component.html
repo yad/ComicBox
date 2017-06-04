@@ -1,7 +1,7 @@
 <md-card *ngFor="let book of books">
   <md-card-title>{{book.name}}</md-card-title>
   <md-card-actions>
-    <button md-raised-button color="primary" [routerLink]="[book.name]">
+    <button md-raised-button color="primary" [routerLink]="['/', book.name]">
     <img alt="" [src]="book.thumbnail" />
     </button>
   </md-card-actions>

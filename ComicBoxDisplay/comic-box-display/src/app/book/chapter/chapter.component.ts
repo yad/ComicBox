@@ -1,9 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Http, Response } from '@angular/http';
-import { Observable } from 'rxjs/Observable';
-import { MdDialog } from '@angular/material';
-import { PageComponent } from './page/page.component';
 
 @Component({
     selector: 'app-chapter',
@@ -16,16 +13,7 @@ export class ChapterComponent implements OnInit {
 
     public book: string;
 
-    constructor(private route: ActivatedRoute, private http: Http, private dialog: MdDialog) {
-    }
-
-    openDialog(currentChapter: string) {
-        this.dialog.open(PageComponent, {
-            data: {
-                book: this.book,
-                chapter: currentChapter
-            }
-        });
+    constructor(private route: ActivatedRoute, private http: Http) {
     }
 
     ngOnInit() {
@@ -33,16 +21,11 @@ export class ChapterComponent implements OnInit {
 
         this.route.params.subscribe(params => {
             this.book = params["book"];
-            const chapter = params["chapter"];
-            this.callApi(1, () => {
-                if (chapter) {
-                    this.openDialog(chapter);
-                }
-            });
+            this.callApi(1);
         });
     }
 
-    private callApi(pagination: number, callback: Function) {
+    private callApi(pagination: number) {
         return this.http.get(`/api/book/comics/${this.book}/${pagination}`).subscribe(response => {
             const result = response.json();
             const collection = result.collection.map(chapter => ({
@@ -53,10 +36,7 @@ export class ChapterComponent implements OnInit {
 
             this.chapters.push(...collection);
             if (result.hasNextPagination) {
-                this.callApi(pagination + 1, callback);
-            }
-            else {
-                callback();
+                this.callApi(pagination + 1);
             }
         });
     }
