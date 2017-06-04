@@ -31,7 +31,7 @@ export class ChapterComponent implements OnInit {
             const collection = result.collection.map(chapter => ({
                 name: chapter.name,
                 displayName: `Tome #${parseInt(chapter.name.slice(0, -4))}`,
-                thumbnail: `data:image/png;base64,${chapter.thumbnail}`
+                thumbnail: chapter.thumbnail ? `data:image/png;base64,${chapter.thumbnail}` : '/assets/nopreview.jpg'
             }));
 
             this.chapters.push(...collection);

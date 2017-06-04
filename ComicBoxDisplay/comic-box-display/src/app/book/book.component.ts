@@ -10,7 +10,7 @@ export class BookComponent implements OnInit {
 
     public books: any[];
 
-    constructor(public http: Http) {
+    constructor(private http: Http) {
     }
 
     ngOnInit() {
@@ -23,7 +23,7 @@ export class BookComponent implements OnInit {
             const result = response.json();
             const collection = result.collection.map(book => ({
                 name: book.name,
-                thumbnail: `data:image/png;base64,${book.thumbnail}`
+                thumbnail: book.thumbnail ? `data:image/png;base64,${book.thumbnail}` : '/assets/nopreview.jpg'
             }));
 
             this.books.push(...collection);
