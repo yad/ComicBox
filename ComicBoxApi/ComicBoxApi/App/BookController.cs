@@ -17,12 +17,6 @@ namespace ComicBoxApi.App
             _cacheService = cacheService;
         }
 
-        [HttpGet("")]
-        public BookContainer<string> Get()
-        {
-            return _bookInfoService.GetInfo();
-        }
-
         [HttpGet("{category}/{pagination}")]
         public BookContainer<Book> Get(string category, int pagination)
         {
@@ -38,12 +32,6 @@ namespace ComicBoxApi.App
             return _cacheService.LoadFromCache(cacheKey, () => _bookInfoService.GetBookInfo(category, book))
                 .WithPagination(pagination);
         }
-
-        //[HttpGet("{category}/{book}/{chapter}")]
-        //public BookContainer<string> Get(string category, string book, string chapter)
-        //{
-        //    return new BookInfoService(_fileProvider).GetInfo(category, book, chapter);
-        //}
 
         [HttpGet("{category}/{book}/{chapter}/{page}")]
         public PageDetail Get(string category, string book, string chapter, int page)

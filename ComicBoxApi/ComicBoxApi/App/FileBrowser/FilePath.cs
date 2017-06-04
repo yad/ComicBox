@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Linq;
 
 namespace ComicBoxApi.App.FileBrowser
 {
@@ -8,10 +9,21 @@ namespace ComicBoxApi.App.FileBrowser
 
         public string AbsolutePath { get; private set; }
 
+        private readonly string _lastPath;
+        
         public FilePath(string rootPath, params string[] relativePaths)
         {
             RelativePath = Path.Combine(relativePaths);
             AbsolutePath = Path.Combine(rootPath, RelativePath);
+            _lastPath = relativePaths.LastOrDefault();
+        }
+
+        public string FileName
+        {
+            get
+            {
+                return _lastPath != null && Path.HasExtension(_lastPath) ? _lastPath : string.Empty;
+            }
         }
     }
 }

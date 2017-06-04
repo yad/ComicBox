@@ -12,7 +12,6 @@ namespace ComicBoxApi.App
     {
         BookContainer<Book> GetBookInfo(params string[] subpaths);
         PageDetail GetDetail(string category, string book, string chapter, int page);
-        BookContainer<string> GetInfo(params string[] subpaths);
     }
 
     public class BookInfoService : IBookInfoService
@@ -25,15 +24,6 @@ namespace ComicBoxApi.App
         {
             _filePathFinder = filePathFinder;
             _imageService = imageService;
-        }
-
-        public BookContainer<string> GetInfo(params string[] subpaths)
-        {
-            _filePathFinder.SetPathContext(subpaths);
-
-            var dirInfo = _filePathFinder.GetDirectoryContents(ListMode.OnlyDirectories);
-            var thumbnail = new ThumbnailProvider(_filePathFinder, _imageService).GetThumbnail("thumbnail");
-            return new BookContainer<string>(Convert.ToBase64String(thumbnail), dirInfo.Select(d => d.Name));
         }
 
         public BookContainer<Book> GetBookInfo(params string[] subpaths)
