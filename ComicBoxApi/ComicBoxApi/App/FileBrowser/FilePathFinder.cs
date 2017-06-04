@@ -13,7 +13,7 @@ namespace ComicBoxApi.App.FileBrowser
         IFileInfo GetPreviousFileNameOrDefault(string file, string matchExtension);
         IFileInfo GetNextFileNameOrDefault(string file, string matchExtension);
         FilePath GetPath();
-        IFileInfo GetThumbnailFileInfoForFile(string file);
+        IFileInfo GetThumbnailFileInfoForFile(FilePath filePath);
         FilePath LocateFile(string file);
         FilePath LocateFirstFile(string matchExtension);
         void SetPathContext(params string[] subpaths);
@@ -77,9 +77,9 @@ namespace ComicBoxApi.App.FileBrowser
             return directoryContents.ToArray();
         }
 
-        public IFileInfo GetThumbnailFileInfoForFile(string file)
+        public IFileInfo GetThumbnailFileInfoForFile(FilePath filePath)
         {
-            return _fileProvider.GetFileInfo(LocateFile(file).RelativePath);
+            return _fileProvider.GetFileInfo(filePath.RelativePath);
         }
 
         public FilePath LocateFile(string file)

@@ -25,20 +25,21 @@ namespace ComicBoxApi.App.Imaging
 
         private IFileInfo EnsureThumbnail(string name)
         {
-            string file = string.Format("{0}.jpg", name);
-            var fileInfo = _pathFinder.GetThumbnailFileInfoForFile(file);
+            string defaultFileContainerExtension = BookInfoService.DefaultFileContainerExtension;
+            var filePath = name.Contains(defaultFileContainerExtension) ? _pathFinder.LocateFile(name) : _pathFinder.LocateFirstFile(defaultFileContainerExtension);
+            string thumbnailFileName = string.Format("{0}.jpg", filePath.FileName);
+            var thumbnailFile = _pathFinder.LocateFile(thumbnailFileName);            
+            var fileInfo = _pathFinder.GetThumbnailFileInfoForFile(thumbnailFile);
             if (!fileInfo.Exists)
             {
-                var defaultFileContainerExtension = BookInfoService.DefaultFileContainerExtension;
-                var path = name.Contains(defaultFileContainerExtension) ? _pathFinder.LocateFile(name) : _pathFinder.LocateFirstFile(defaultFileContainerExtension);
-                using (StreamWriter sw = new StreamWriter(_pathFinder.LocateFile(file).AbsolutePath))
+                using (StreamWriter sw = new StreamWriter(thumbnailFile.AbsolutePath))
                 {
-                    var fileContent = new PdfReaderService(path.AbsolutePath).ReadImageFirstPage();
+                    var fileContent = new PdfReaderService(filePath.AbsolutePath).ReadImageFirstPage();
                     var thumbnailContent = _imageService.ScaleAsThumbnail(fileContent);
                     sw.BaseStream.Write(thumbnailContent, 0, thumbnailContent.Length);
                 }
 
-                fileInfo = _pathFinder.GetThumbnailFileInfoForFile(file);
+                fileInfo = _pathFinder.GetThumbnailFileInfoForFile(thumbnailFile);
             }
 
             return fileInfo;
