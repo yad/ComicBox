@@ -1,4 +1,5 @@
 ﻿using ComicBoxApi.App.Cache;
+using ComicBoxApi.App.Worker;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ComicBoxApi.App
@@ -10,17 +11,21 @@ namespace ComicBoxApi.App
 
         private readonly ICacheService _cacheService;
 
-        public BookController(IBookInfoService bookInfoService, ICacheService cacheService)
+        private readonly ThumbnailWorker _thumbnailWorker;
+
+        public BookController(IBookInfoService bookInfoService, ICacheService cacheService, ThumbnailWorker thumbnailWorker)
         {
             _bookInfoService = bookInfoService;
             _cacheService = cacheService;
+            _thumbnailWorker = thumbnailWorker;
         }
 
         [HttpGet("{category}/{pagination}")]
         public BookContainer<Book> Get(string category, int pagination)
         {
             string cacheKey = $"allBooksForCategory_{category}";
-            return _cacheService.LoadFromCache(cacheKey, () => _bookInfoService.GetBookInfo(category))
+            var thumbnailWorkerStatus = _thumbnailWorker.GetStatus();
+            return _cacheService.TryLoadFromCache(cacheKey, () => _bookInfoService.GetBookInfo(category), !thumbnailWorkerStatus.IsInProgress)
                 .WithPagination(pagination);
         }
         
@@ -28,7 +33,8 @@ namespace ComicBoxApi.App
         public BookContainer<Book> Get(string category, string book, int pagination)
         {
             string cacheKey = $"chaptersForBook_{category}_{book}";
-            return _cacheService.LoadFromCache(cacheKey, () => _bookInfoService.GetBookInfo(category, book))
+            var thumbnailWorkerStatus = _thumbnailWorker.GetStatus();
+            return _cacheService.TryLoadFromCache(cacheKey, () => _bookInfoService.GetBookInfo(category, book), !thumbnailWorkerStatus.IsInProgress)
                 .WithPagination(pagination);
         }
 

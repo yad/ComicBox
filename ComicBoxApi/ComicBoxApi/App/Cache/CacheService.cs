@@ -5,7 +5,7 @@ namespace ComicBoxApi.App.Cache
 {
     public interface ICacheService
     {
-        T LoadFromCache<T>(string key, Func<T> service);
+        T TryLoadFromCache<T>(string key, Func<T> service, bool cache);
     }
 
     public class CacheService : ICacheService
@@ -17,13 +17,16 @@ namespace ComicBoxApi.App.Cache
             _memoryCache = memoryCache;
         }
 
-        public T LoadFromCache<T>(string key, Func<T> service)
+        public T TryLoadFromCache<T>(string key, Func<T> service, bool cache)
         {
             T result;
             if (!_memoryCache.TryGetValue(key, out result))
             {
                 result = service();
-                _memoryCache.Set(key, result);
+                if (cache)
+                {
+                    _memoryCache.Set(key, result);
+                }
             }
 
             return result;

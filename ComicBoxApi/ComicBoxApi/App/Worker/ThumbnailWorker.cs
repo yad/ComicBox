@@ -1,15 +1,14 @@
 ﻿using ComicBoxApi.App.FileBrowser;
+using ComicBoxApi.App.Imaging;
 using ComicBoxApi.App.PdfReader;
-using Microsoft.Extensions.FileProviders;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ComicBoxApi.App.Imaging
+namespace ComicBoxApi.App.Worker
 {
-
     public class ThumbnailWorker
     {
         private readonly IFilePathFinder _filePathFinder;
@@ -18,7 +17,7 @@ namespace ComicBoxApi.App.Imaging
 
         private Task _worker;
 
-        private Dictionary<IFileInfo, IFileInfo> _inProgress;
+        private List<ThumbnailInfo> _inProgress;
 
         private List<ThumbnailWorkerError> _errors;
 
@@ -27,11 +26,21 @@ namespace ComicBoxApi.App.Imaging
             _filePathFinder = filePathFinder;
             _imageService = imageService;
 
-            _inProgress = new Dictionary<IFileInfo, IFileInfo>();
+            _inProgress = new List<ThumbnailInfo>();
             _errors = new List<ThumbnailWorkerError>();
         }
 
-        public Task GetTask()
+        public void Start()
+        {
+            GetTask();
+        }
+
+        public async Task Stop()
+        {
+            await GetTask();
+        }
+
+        private Task GetTask()
         {
             if (_worker == null)
             {
@@ -45,43 +54,9 @@ namespace ComicBoxApi.App.Imaging
         {
             BrowseAndGenerate("");
 
-            while (_inProgress.Any(kvp => kvp.Value != null))
+            foreach(var current in _inProgress)
             {
-                var current = _inProgress.First(kvp => kvp.Value != null);
-                ProcessFile(current.Key, current.Value);
-                _inProgress[current.Key] = null;
-            }
-        }
-
-        public bool IsInProgress
-        {
-            get
-            {
-                return GetTask().Status < TaskStatus.RanToCompletion;
-            }
-        }
-
-        public string InProgressMessage
-        {
-            get
-            {
-                return string.Format("Building thumbnails is in progress... {0}/{1}", _inProgress.Count(kvp => kvp.Value == null), _inProgress.Count());
-            }
-        }
-
-        public bool IsFaulted
-        {
-            get
-            {
-                return GetTask().IsFaulted || _errors.Any();
-            }
-        }
-
-        public string DisplayErrors
-        {
-            get
-            {
-                return string.Join(" - ", _errors.Select(error => error.ToString()));
+                ProcessFile(current);
             }
         }
 
@@ -100,20 +75,20 @@ namespace ComicBoxApi.App.Imaging
                     var fileInfo = new ThumbnailProvider(_filePathFinder).GetThumbnail(dir.Name);
                     if (!fileInfo.Exists)
                     {
-                        _inProgress.Add(dir, fileInfo);
+                        _inProgress.Add(new ThumbnailInfo(dir, fileInfo));
                     }
                 }
             }
         }
 
-        private void ProcessFile(IFileInfo currentFile, IFileInfo currentFileThumbnail)
+        private void ProcessFile(ThumbnailInfo current)
         {
             try
             {
-                var fileContent = new PdfReaderService(currentFile.PhysicalPath).ReadImageFirstPage();
+                var fileContent = new PdfReaderService(current.Book.PhysicalPath).ReadImageFirstPage();
                 var thumbnailContent = _imageService.ScaleAsThumbnail(fileContent);
 
-                var fileInfoPhysicalPath = string.Format("{0}.jpg", currentFile.PhysicalPath);
+                var fileInfoPhysicalPath = string.Format("{0}.jpg", current.Book.PhysicalPath);
                 using (StreamWriter sw = new StreamWriter(fileInfoPhysicalPath))
                 {
                     sw.BaseStream.Write(thumbnailContent, 0, thumbnailContent.Length);
@@ -121,8 +96,20 @@ namespace ComicBoxApi.App.Imaging
             }
             catch (Exception ex)
             {
-                _errors.Add(new ThumbnailWorkerError(currentFileThumbnail.Name, ex));
+                _errors.Add(new ThumbnailWorkerError(current.Thumbnail.Name, ex));
             }
+
+            current.IsCompleted = true;
+        }
+
+        public ThumbnailWorkerStatus GetStatus()
+        {
+            bool isInProgress = GetTask().Status < TaskStatus.RanToCompletion;            
+            bool isFaulted = GetTask().IsFaulted || _errors.Any();
+
+            return new ThumbnailWorkerStatus()
+                .WithProgress(isInProgress, _inProgress)
+                .WithErrors(isFaulted, _errors);
         }
     }
 }

@@ -4,6 +4,10 @@
     {{title}}
     <span class="app-toolbar-filler"></span>
   </md-toolbar>
+  <md-progress-bar color="warn"
+                   mode="determinate"
+                   [value]="progress.ratio">
+  </md-progress-bar>
 
   <div class="app-content" color="primary">
     <router-outlet></router-outlet>
