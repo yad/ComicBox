@@ -4,12 +4,14 @@ using ComicBoxApi.App.FileBrowser;
 using ComicBoxApi.App.Imaging;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
+using System.Text;
 
 namespace ComicBoxApi
 {
@@ -88,10 +90,39 @@ namespace ComicBoxApi
 
             services.AddTransient<IBookInfoService, BookInfoService>();
             services.AddTransient<IFilePathFinder, FilePathFinder>();
+            services.AddSingleton<ThumbnailWorker, ThumbnailWorker>();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            app.ApplicationServices.GetService<ThumbnailWorker>().GetTask();
+            app.Use(async (context, next) => 
+            {
+                var thumbnailWorker = context.RequestServices.GetService<ThumbnailWorker>();
+                if (thumbnailWorker.IsInProgress)
+                {
+                    StringBuilder stringBuilder = new StringBuilder();
+                    stringBuilder.AppendLine("<html>");
+                    stringBuilder.AppendLine("<head>");
+                    stringBuilder.AppendLine("<meta http-equiv=\"refresh\" content=\"5\" >");
+                    stringBuilder.AppendLine("</head>");
+                    stringBuilder.AppendLine("<body>");
+                    stringBuilder.AppendFormat("<p>{0}</p>", thumbnailWorker.InProgressMessage);
+                    stringBuilder.AppendLine("</body>");
+                    stringBuilder.AppendLine("</html>");
+                    await context.Response.WriteAsync(stringBuilder.ToString());
+                }
+                else if(thumbnailWorker.IsFaulted)
+                {
+                    await context.Response.WriteAsync(thumbnailWorker.DisplayErrors);
+                }
+                else
+                {
+                    await thumbnailWorker.GetTask();
+                    await next();
+                }
+            });
+
             // UseDeveloperExceptionPage before UseMvc
             app.UseDeveloperExceptionPage();
 
