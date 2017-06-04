@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace ComicBoxApi.App.Worker
@@ -57,7 +56,6 @@ namespace ComicBoxApi.App.Worker
 
             foreach(var current in _inProgress)
             {
-                Thread.Sleep(1000);
                 ProcessFile(current);
             }
         }
