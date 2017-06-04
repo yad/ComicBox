@@ -74,7 +74,7 @@ namespace ComicBoxApi.App.FileBrowser
                     break;
             }
 
-            return directoryContents.ToArray();
+            return directoryContents.OrderBy(c => c.Name).ToArray();
         }
 
         public IFileInfo GetThumbnailFileInfoForFile(FilePath filePath)
