@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Http, Response } from '@angular/http';
+import { WorkerService } from './worker.service';
 
 @Component({
     selector: 'app-root',
@@ -14,7 +15,7 @@ export class AppComponent implements OnInit {
 
     private interval: any;
 
-    constructor(private http: Http) {
+    constructor(private workerService: WorkerService) {
         this.title = 'Comic Box';        
     }
 
@@ -24,9 +25,8 @@ export class AppComponent implements OnInit {
     }
 
     private callApi() {
-        this.http.get("api/progress/thumbnailworkerstatus").subscribe(response => {
-            this.progress = response.json();
-            this.progress.ratio = this.progress.inProgressCompletedCount === this.progress.inProgressTotalCount ? 100 : Math.ceil(this.progress.inProgressCompletedCount / this.progress.inProgressTotalCount * 100)
+        this.workerService.getThumbnailWorkerStatus().subscribe(result => {
+            this.progress = result;
             if (!this.progress.isInProgress) {
                 clearInterval(this.interval);
             }

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Http, Response } from '@angular/http';
+import { WorkerService } from './../../worker.service';
 
 @Component({
     selector: 'app-chapter',
@@ -13,7 +14,7 @@ export class ChapterComponent implements OnInit {
 
     public book: string;
 
-    constructor(private route: ActivatedRoute, private http: Http) {
+    constructor(private route: ActivatedRoute, private http: Http, private workerService: WorkerService) {
     }
 
     ngOnInit() {
@@ -30,7 +31,10 @@ export class ChapterComponent implements OnInit {
                 }));
 
                 this.chapters.push(...collection);
-                this.callApi(1);
+
+                if (!this.workerService.isInProgress()) {
+                    this.callApi(1);
+                }
             });            
         });
     }
