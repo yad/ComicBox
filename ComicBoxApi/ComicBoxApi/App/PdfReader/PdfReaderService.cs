@@ -18,9 +18,10 @@ namespace ComicBoxApi.App.PdfReader
             _imageService = new ImageService();
         }
 
-        public byte[] ReadImageFirstPage()
+        public byte[] ReadCoverImage()
         {
-            return ReadImageAtPage(1);
+            int firstPage = IsDoublePage(1) ? 2 : 1;
+            return ReadImageAtPage(firstPage);
         }
 
         public byte[] ReadImageAtPage(int page)
