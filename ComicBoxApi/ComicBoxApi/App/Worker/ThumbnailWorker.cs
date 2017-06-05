@@ -85,7 +85,7 @@ namespace ComicBoxApi.App.Worker
         {
             try
             {
-                var fileContent = new PdfReaderService(current.Book.PhysicalPath).ReadImageFirstPage();
+                var fileContent = new PdfReaderService(current.Book.PhysicalPath).ReadCoverImage();
                 var thumbnailContent = _imageService.ScaleAsThumbnail(fileContent);
 
                 var fileInfoPhysicalPath = string.Format("{0}.jpg", current.Book.PhysicalPath);
