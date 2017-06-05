@@ -5,12 +5,15 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using ComicBoxApi.App.Cache;
+using ComicBoxApi.App.Worker;
 
 namespace ComicBoxApi.App
 {
     public interface IBookInfoService
     {
-        BookContainer<Book> GetBookInfo(params string[] subpaths);
+        BookContainer<Book> GetBookList(params string[] subpaths);
+        BookContainer<Book> GetBookThumbnails(params string[] subpaths);
         PageDetail GetDetail(string category, string book, string chapter, int page);
     }
 
@@ -18,15 +21,33 @@ namespace ComicBoxApi.App
     {
         private readonly IFilePathFinder _filePathFinder;
         private readonly IImageService _imageService;
+        private readonly ICacheService _cacheService;
+        private readonly ThumbnailWorker _thumbnailWorker;
         public static readonly string DefaultFileContainerExtension = ".pdf";
 
-        public BookInfoService(IFilePathFinder filePathFinder, IImageService imageService)
+        public BookInfoService(IFilePathFinder filePathFinder, IImageService imageService, ICacheService cacheService, ThumbnailWorker thumbnailWorker)
         {
             _filePathFinder = filePathFinder;
             _imageService = imageService;
+            _cacheService = cacheService;
+            _thumbnailWorker = thumbnailWorker;
         }
 
-        public BookContainer<Book> GetBookInfo(params string[] subpaths)
+        public BookContainer<Book> GetBookList(params string[] subpaths)
+        {
+            string cacheKey = $"booklist_{string.Join("_", subpaths)}";
+            return _cacheService.TryLoadFromCache(cacheKey, () => BuildBookInfo(subpaths, true));
+        }
+
+        public BookContainer<Book> GetBookThumbnails(params string[] subpaths)
+        {
+            string cacheKey = $"bookthumbnails_{string.Join("_", subpaths)}";
+            var thumbnailWorkerStatus = _thumbnailWorker.GetStatus();
+            bool ignoreThumbnails = thumbnailWorkerStatus.IsInProgress;
+            return _cacheService.TryLoadFromCache(cacheKey, () => BuildBookInfo(subpaths, ignoreThumbnails));
+        }
+
+        private BookContainer<Book> BuildBookInfo(string[] subpaths, bool ignoreThumbnails)
         {
             _filePathFinder.SetPathContext(subpaths);
 
@@ -39,11 +60,19 @@ namespace ComicBoxApi.App
                 {
                     _filePathFinder.AppendPathContext(container.Name);
                 }
-                var thumbnail = new ThumbnailProvider(_filePathFinder).GetThumbnailContent(container.Name);
-                books.Add(new Book(container.Name, Convert.ToBase64String(thumbnail)));
+
+                string thumbnailContent = string.Empty;
+                if (!ignoreThumbnails)
+                {
+                    var thumbnail = new ThumbnailProvider(_filePathFinder).GetThumbnailContent(container.Name);
+                    thumbnailContent = Convert.ToBase64String(thumbnail);
+                }
+                                
+                books.Add(new Book(container.Name, thumbnailContent));
             }
 
-            return new BookContainer<Book>(string.Empty, books);
+            bool cacheEnable = !ignoreThumbnails;
+            return new BookContainer<Book>(string.Empty, books).WithCache(cacheEnable);
         }
 
         public PageDetail GetDetail(string category, string book, string chapter, int page)

@@ -1,16 +1,19 @@
-﻿using System;
+﻿using ComicBoxApi.App.Cache;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace ComicBoxApi.App
 {
-    public class BookContainer<T>
+    public class BookContainer<T> : ICacheConfiguration
     {
         public string Thumbnail { get; private set; }
 
         public IReadOnlyCollection<T> Collection { get; private set; }
 
         public bool HasNextPagination { get; private set; }
+
+        public bool CacheResult { get; private set; }
 
         public BookContainer(string thumbnail, IEnumerable<T> collection) 
             : this(thumbnail, false, collection)
@@ -22,6 +25,12 @@ namespace ComicBoxApi.App
             Thumbnail = thumbnail;
             HasNextPagination = hasNextPagination;
             Collection = collection.ToArray();
+        }
+
+        public BookContainer<T> WithCache(bool enableCache)
+        {
+            CacheResult = enableCache;
+            return this;
         }
 
         public BookContainer<T> WithPagination(int pagination)

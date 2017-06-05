@@ -1,6 +1,4 @@
-﻿using ComicBoxApi.App.Cache;
-using ComicBoxApi.App.Worker;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 
 namespace ComicBoxApi.App
 {
@@ -9,33 +7,21 @@ namespace ComicBoxApi.App
     {
         private readonly IBookInfoService _bookInfoService;
 
-        private readonly ICacheService _cacheService;
-
-        private readonly ThumbnailWorker _thumbnailWorker;
-
-        public BookController(IBookInfoService bookInfoService, ICacheService cacheService, ThumbnailWorker thumbnailWorker)
+        public BookController(IBookInfoService bookInfoService)
         {
             _bookInfoService = bookInfoService;
-            _cacheService = cacheService;
-            _thumbnailWorker = thumbnailWorker;
         }
 
-        [HttpGet("{category}/{pagination}")]
-        public BookContainer<Book> Get(string category, int pagination)
+        [HttpGet("{category}")]
+        public BookContainer<Book> Get(string category)
         {
-            string cacheKey = $"allBooksForCategory_{category}";
-            var thumbnailWorkerStatus = _thumbnailWorker.GetStatus();
-            return _cacheService.TryLoadFromCache(cacheKey, () => _bookInfoService.GetBookInfo(category), !thumbnailWorkerStatus.IsInProgress)
-                .WithPagination(pagination);
+            return _bookInfoService.GetBookList(category);
         }
         
-        [HttpGet("{category}/{book}/{pagination}")]
-        public BookContainer<Book> Get(string category, string book, int pagination)
+        [HttpGet("{category}/{book}")]
+        public BookContainer<Book> Get(string category, string book)
         {
-            string cacheKey = $"chaptersForBook_{category}_{book}";
-            var thumbnailWorkerStatus = _thumbnailWorker.GetStatus();
-            return _cacheService.TryLoadFromCache(cacheKey, () => _bookInfoService.GetBookInfo(category, book), !thumbnailWorkerStatus.IsInProgress)
-                .WithPagination(pagination);
+            return _bookInfoService.GetBookList(category, book);
         }
 
         [HttpGet("{category}/{book}/{chapter}/{page}")]
