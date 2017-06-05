@@ -26,7 +26,7 @@ export class AppComponent implements OnInit {
     private callApi() {
         this.http.get("api/progress/thumbnailworkerstatus").subscribe(response => {
             this.progress = response.json();
-            this.progress.ratio = Math.ceil(this.progress.inProgressCompletedCount / this.progress.inProgressTotalCount * 100)
+            this.progress.ratio = this.progress.inProgressCompletedCount === this.progress.inProgressTotalCount ? 100 : Math.ceil(this.progress.inProgressCompletedCount / this.progress.inProgressTotalCount * 100)
             if (!this.progress.isInProgress) {
                 clearInterval(this.interval);
             }

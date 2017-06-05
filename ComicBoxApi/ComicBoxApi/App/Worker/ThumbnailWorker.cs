@@ -17,9 +17,9 @@ namespace ComicBoxApi.App.Worker
 
         private Task _worker;
 
-        private List<ThumbnailInfo> _inProgress;
+        private readonly List<ThumbnailInfo> _inProgress;
 
-        private List<ThumbnailWorkerError> _errors;
+        private readonly List<ThumbnailWorkerError> _errors;
 
         public ThumbnailWorker(IFilePathFinder filePathFinder, IImageService imageService)
         {
