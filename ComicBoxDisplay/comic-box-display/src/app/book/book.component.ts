@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Http, Response } from '@angular/http';
+import { WorkerService } from './../worker.service';
 
 @Component({
     selector: 'app-book',
@@ -10,7 +11,7 @@ export class BookComponent implements OnInit {
 
     public books: any[];
 
-    constructor(private http: Http) {
+    constructor(private http: Http, private workerService: WorkerService) {
     }
 
     ngOnInit() {
@@ -21,8 +22,12 @@ export class BookComponent implements OnInit {
                 name: book.name,
                 thumbnail: book.thumbnail ? `data:image/png;base64,${book.thumbnail}` : '/assets/nopreview.jpg'
             }));
+
             this.books.push(...collection);
-            this.callApi(1);
+
+            if (!this.workerService.isInProgress()) {
+                this.callApi(1);
+            }
         });
     }
 

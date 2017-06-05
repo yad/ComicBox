@@ -14,6 +14,8 @@ import { ChapterComponent } from './book/chapter/chapter.component';
 import { PageComponent } from './book/chapter/page/page.component';
 import { ModalComponent } from './book/chapter/page/modal/modal.component';
 
+import { WorkerService } from './worker.service';
+
 @NgModule({
     declarations: [
         AppComponent,
@@ -30,7 +32,7 @@ import { ModalComponent } from './book/chapter/page/modal/modal.component';
         MaterialModule,
         BrowserAnimationsModule,
     ],
-    providers: [],
+    providers: [WorkerService],
     bootstrap: [AppComponent]
 })
 export class AppModule { }
