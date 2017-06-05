@@ -21,12 +21,22 @@ export class ChapterComponent implements OnInit {
 
         this.route.params.subscribe(params => {
             this.book = params["book"];
-            this.callApi(1);
+            this.http.get(`/api/book/comics/${this.book}`).subscribe(response => {
+                const result = response.json();
+                const collection = result.collection.map(chapter => ({
+                    name: chapter.name,
+                    displayName: `Tome #${parseInt(chapter.name.slice(0, -4))}`,
+                    thumbnail: chapter.thumbnail ? `data:image/png;base64,${chapter.thumbnail}` : '/assets/nopreview.jpg'
+                }));
+
+                this.chapters.push(...collection);
+                this.callApi(1);
+            });            
         });
     }
 
     private callApi(pagination: number) {
-        return this.http.get(`/api/book/comics/${this.book}/${pagination}`).subscribe(response => {
+        this.http.get(`/api/thumbnail/comics/${this.book}/${pagination}`).subscribe(response => {
             const result = response.json();
             const collection = result.collection.map(chapter => ({
                 name: chapter.name,
@@ -34,7 +44,13 @@ export class ChapterComponent implements OnInit {
                 thumbnail: chapter.thumbnail ? `data:image/png;base64,${chapter.thumbnail}` : '/assets/nopreview.jpg'
             }));
 
-            this.chapters.push(...collection);
+            collection.forEach(chapter => {
+                let currentChapter = this.chapters.filter(c => c.name === chapter.name)[0];
+                if (currentChapter) {
+                    currentChapter.thumbnail = chapter.thumbnail;
+                }
+            });
+
             if (result.hasNextPagination) {
                 this.callApi(pagination + 1);
             }
