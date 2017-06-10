@@ -96,7 +96,7 @@ namespace ComicBoxApi.App.Worker
             }
             catch (Exception ex)
             {
-                _errors.Add(new ThumbnailWorkerError(current.Thumbnail.Name, ex));
+                _errors.Add(new ThumbnailWorkerError(current.Book.PhysicalPath, ex));
             }
 
             current.IsCompleted = true;
